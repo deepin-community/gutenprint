@@ -1,0 +1,271 @@
+Source: gutenprint
+Maintainer: Debian Printing Group <debian-printing@lists.debian.org>
+Section: graphics
+Priority: optional
+Build-Depends-Indep:
+ docbook-utils,
+ doxygen,
+Build-Depends:
+ byacc,
+ chrpath,
+ debhelper-compat (= 13),
+ flex,
+ gettext,
+ libcups2-dev,
+ libcupsimage2-dev,
+ libgimp2.0-dev,
+ libijs-dev,
+ libreadline-dev,
+ libusb-1.0-0-dev [linux-any],
+ zlib1g-dev,
+Standards-Version: 4.6.0
+Vcs-Browser: https://salsa.debian.org/printing-team/gutenprint
+Vcs-Git: https://salsa.debian.org/printing-team/gutenprint.git
+Homepage: http://gimp-print.sourceforge.net/
+
+Package: gimp-gutenprint
+Architecture: any
+Depends:
+ gimp,
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ gutenprint-doc (>= ${source:Version}),
+ gutenprint-locales (>= ${source:Version}),
+Enhances:
+ gimp,
+Description: print plugin for the GIMP
+ This package includes the Gutenprint Print plugin for the GIMP.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: escputil
+Architecture: any
+Section: utils
+Depends:
+ libgutenprint9 (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ gutenprint-locales (>= ${source:Version}),
+Description: maintenance utility for Epson Stylus printers
+ escputil is a utility to clean and align the heads of Epson Stylus
+ printers.  It can also check the current ink levels in the printer.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: gutenprint-doc
+Architecture: all
+Section: doc
+Depends:
+ ${misc:Depends},
+Suggests:
+ gimp-gutenprint (>= ${source:Version}),
+ libjs-jquery,
+ printer-driver-gutenprint (>= ${source:Version}),
+Description: users' guide for Gutenprint and CUPS
+ This package contains a user guide for programs using the
+ Gutenprint library for photographic quality printing.  Currently
+ this covers using the Print plugin for the GIMP and the Common Unix
+ Printing System (CUPS).
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: gutenprint-locales
+Architecture: all
+Section: libs
+Depends:
+ ${misc:Depends},
+Description: locale data files for Gutenprint
+ This package contains the i18n files of Gutenprint, used by
+ libgutenprint9, printer-driver-gutenprint and escputil.  It is also
+ used by the Print plugin for the GIMP, gimp-gutenprint.
+ .
+ They are needed when you want the programs in Gutenprint to print
+ their messages in other languages than US English.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprint-common
+Architecture: all
+Section: libs
+Depends:
+ ${misc:Depends},
+Recommends:
+ libgutenprint9 (>= ${source:Version}),
+Suggests:
+ gutenprint-locales (>= ${source:Version}),
+Description: support files for the Gutenprint printer driver library
+ This package includes the Gutenprint printer definitions needed by
+ libgutenprint9 to run programs using Gutenprint drivers.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprint-dev
+Architecture: any
+Section: libdevel
+Depends:
+ libgutenprint9 (= ${binary:Version}),
+ pkg-config,
+ ${misc:Depends},
+Suggests:
+ libgutenprint-doc (= ${source:Version}),
+Description: development files for the Gutenprint printer driver library
+ This package contains the header files for the Gutenprint library,
+ along with a static version of libgutenprint.
+ .
+ Install this package if you wish to develop programs that use
+ libgutenprint.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprint-doc
+Architecture: all
+Section: doc
+Depends:
+ libjs-jquery,
+ ${misc:Depends},
+Suggests:
+ libgutenprint-dev (= ${source:Version}),
+Description: documentation for the Gutenprint printer driver library
+ This package contains lots of info-files, DVI docs and other
+ documentation about the Gutenprint library for photo-quality
+ printing.
+ .
+ Install this package if you want to have lots of info about the
+ Gutenprint library when you're programming.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprint9
+Architecture: any
+Section: libs
+Depends:
+ libgutenprint-common (>= ${source:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends},
+Suggests:
+ gutenprint-locales (>= ${source:Version}),
+Pre-Depends:
+ ${misc:Pre-Depends},
+Description: runtime for the Gutenprint printer driver library
+ This package includes the Gutenprint shared library, needed to
+ run programs using Gutenprint drivers.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprintui2-2
+Architecture: any
+Section: libs
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends:
+ gutenprint-locales (>= ${source:Version}),
+Pre-Depends:
+ ${misc:Pre-Depends},
+Description: runtime for the Gutenprint printer driver user interface library
+ This package includes the libgutenprintui library, necessary to run
+ gimp-gutenprint.  libgutenprintui contains GTK+ widgets which may be
+ used for print dialogs etc. for use with libgutenprint.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: libgutenprintui2-dev
+Architecture: any
+Section: libdevel
+Depends:
+ libgutenprintui2-2 (= ${binary:Version}),
+ pkg-config,
+ ${misc:Depends},
+Suggests:
+ libgutenprint-doc (= ${source:Version}),
+Description: development files for the Gutenprint printer driver user interface library
+ This package contains the header files for the libgutenprintui
+ library, along with a static version of libgutenprintui.
+ libgutenprintui contains GTK+ widgets which may be used for print
+ dialogs etc. for use with libgutenprint.
+ .
+ Install this package if you wish to develop packages that use
+ libgutenprintui.
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.
+
+Package: printer-driver-gutenprint
+Architecture: any
+Depends:
+ cups,
+ cups-client,
+ cups-filters | ghostscript-cups (<< 9.08),
+ ${misc:Depends},
+ ${perl:Depends},
+ ${shlibs:Depends},
+Suggests:
+ gutenprint-doc (>= ${source:Version}),
+ gutenprint-locales (>= ${source:Version}),
+Description: printer drivers for CUPS
+ This package includes a CUPS driver based on Gutenprint.
+ .
+ The CUPS drivers contain all of the files needed to support
+ photo-quality printing on any printer supported by Gutenprint.  You
+ can find out more about the Common UNIX Printing System ("CUPS"), an
+ IPP-based printing system for UNIX/Linux, at:
+ .
+   http://www.cups.org
+ .
+ Gutenprint is the print facility for the GIMP, and in addition a
+ suite of drivers that may be used with common UNIX spooling systems
+ using GhostScript or CUPS.  These drivers provide printing quality
+ for UNIX/Linux on a par with proprietary vendor-supplied drivers in
+ many cases, and can be used for many of the most demanding printing
+ tasks.  Gutenprint was formerly known as Gimp-Print.

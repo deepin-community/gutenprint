@@ -1,0 +1,9 @@
+# Get rid of GMO
+po/*.gmo
+# Bison-generated files
+src/gutenprintui2/printrcy.c
+src/gutenprintui2/printrcy.h
+# pdfs
+doc/developer/gutenprint.pdf
+# TODO
+# doc/gutenprint-users-manual.pdf

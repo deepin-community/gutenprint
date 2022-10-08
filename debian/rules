@@ -1,0 +1,81 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@
+
+override_dh_autoreconf:
+	[ -d m4local ] || mkdir -p m4local
+	dh_autoreconf
+
+ifneq (,$(filter libgutenprint-doc, $(shell dh_listpackages)))
+MAINTAINER_MODE += "--enable-maintainer-mode"
+endif
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	  --libdir=/usr/lib/$(DEB_HOST_MULTIARCH) \
+	  --disable-static --enable-shared --disable-rpath \
+	  --disable-static-genppd \
+	  --with-modules=dlopen \
+	  --enable-libgutenprintui2 --with-gimp2 \
+	  --with-cups --enable-cups-level3-ppds --enable-globalized-cups-ppds \
+	  --enable-cups-1_2-enhancements --disable-cups-ppds \
+	  --enable-test --disable-testpattern \
+	  $(MAINTAINER_MODE) \
+	  --enable-nls
+
+execute_after_dh_auto_build-indep:
+	# Build the gettext translations (#987457)
+	cd po && make update-gmo
+
+override_dh_install-indep:
+	dh_install -i
+	rm -f debian/gutenprint-locales/usr/share/locale/*/*.po
+	# Make sure at least some locales are installed (#987457)
+	test -n "$$(find debian/gutenprint-locales/usr/share/locale -name gutenprint.mo)"
+
+override_dh_installdocs:
+	dh_installdocs -pescputil --link-doc=libgutenprint9
+	dh_installdocs -plibgutenprintui2-dev --link-doc=libgutenprintui2-2
+	dh_installdocs --remaining-packages
+
+override_dh_install-arch:
+ifeq ($(DEB_BUILD_ARCH_OS),linux)
+	dh_install -pprinter-driver-gutenprint usr/share/cups/usb
+endif
+	dh_install -a --remaining-packages
+# Remove rpath
+	find debian/printer-driver-gutenprint/usr/lib -type f -perm /0111 -print0 | xargs -0 chrpath --delete
+# Install ppd-updater file
+	install -D --mode=644 debian/printer-driver-gutenprint.ppd-updater $(CURDIR)/debian/printer-driver-gutenprint/usr/share/cups/ppd-updaters/printer-driver-gutenprint.ppd-updater
+
+override_dh_installchangelogs:
+	dh_installchangelogs NEWS
+
+override_dh_compress:
+	dh_compress -X.pdf -X.odt
+
+override_dh_auto_test:
+	# As dgit doesn't support the executable bit in patches, set it here before running the test
+	chmod +x scripts/test-driver-verbose
+	dh_auto_test
+
+override_dh_perl:
+	dh_perl -d
+
+override_dh_makeshlibs:
+	dh_makeshlibs -a -V -X usr/lib/$(DEB_HOST_MULTIARCH)/gutenprint
+
+override_dh_shlibdeps:
+	dh_shlibdeps -a -X usr/lib/$(DEB_HOST_MULTIARCH)/gutenprint -ldebian/libgutenprint9/usr/lib/$(DEB_HOST_MULTIARCH):debian/libgutenprintui2-2/usr/lib/$(DEB_HOST_MULTIARCH)
+
+override_dh_fixperms:
+	dh_fixperms
+# Make the gutenprint52+usb backend run as root, since /dev/bus/usb/*
+# are root:root in udev < 147, and the usblp kernel module is not used
+# here; udev 147 makes most of those printers accessible to lp, but
+# apparently not all of them
+	[ ! -f debian/printer-driver-gutenprint/usr/lib/cups/backend/gutenprint52+usb ] || \
+		chmod go-x debian/printer-driver-gutenprint/usr/lib/cups/backend/gutenprint52+usb

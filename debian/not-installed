@@ -1,0 +1,17 @@
+usr/lib/*/libgutenprint.la
+usr/lib/*/libgutenprintui2.la
+usr/sbin/cups-genppd.5.3
+usr/share/gutenprint/doc/AUTHORS
+usr/share/gutenprint/doc/COPYING
+usr/share/gutenprint/doc/ChangeLog
+usr/share/gutenprint/doc/FAQ.html
+usr/share/gutenprint/doc/NEWS
+usr/share/gutenprint/doc/README
+usr/share/gutenprint/doc/gutenprint.pdf
+usr/share/gutenprint/samples/colorbars4.png
+usr/share/gutenprint/samples/colorsweep.png
+usr/share/gutenprint/samples/extended.sample
+usr/share/gutenprint/samples/profile.jpg
+usr/share/gutenprint/samples/testpattern.sample
+usr/share/man/man8/cups-genppd.8
+usr/share/cups/usb/net.sf.gimp-print.usb-quirks

@@ -1,0 +1,38 @@
+From: Didier Raboud <odyx@debian.org>
+Date: Sun, 4 May 2014 12:34:59 +0200
+Subject: Tests: Don't run weavetest,
+ testdither nor rastertogutenprint that are too long
+
+---
+ src/cups/Makefile.am | 2 +-
+ test/Makefile.am     | 4 +---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/src/cups/Makefile.am b/src/cups/Makefile.am
+index 1812d55..99e5673 100644
+--- a/src/cups/Makefile.am
++++ b/src/cups/Makefile.am
+@@ -100,7 +100,7 @@ endif
+ AM_TESTS_ENVIRONMENT=$(STP_ENV)
+ test-rastertogutenprint: min-pagesize
+ test-rastertogutenprint.test: test-rastertogutenprint
+-TESTS= test-ppds.test test-rastertogutenprint.test
++TESTS= test-ppds.test
+ test-rastertogutenprint.log: test-ppds.log
+ 
+ noinst_SCRIPTS=test-ppds.test \
+diff --git a/test/Makefile.am b/test/Makefile.am
+index e98b88c..56dd57f 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -28,9 +28,7 @@ LOCAL_CPPFLAGS = -I$(top_srcdir)/src/main $(GUTENPRINT_CFLAGS)
+ ## It is essentially a giant unit test for the weave code.
+ ## testdither doesn't actually test anything; there appears to be no way
+ ## for it to actually return anything.
+-TESTS = test-curve.test run-weavetest.test run-testdither.test
+-run-testdither.log: run-weavetest.log
+-test-curve.log: run-testdither.log
++TESTS = test-curve.test
+ 
+ ## Programs
+ 
