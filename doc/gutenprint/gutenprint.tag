@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile>
+<tagfile doxygen_version="1.9.3">
   <compound kind="file">
     <name>array.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>array_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>array_8h.html</filename>
     <includes id="sequence_8h" name="sequence.h" local="no" imported="no">gutenprint/sequence.h</includes>
     <member kind="typedef">
       <type>struct stp_array</type>
@@ -16,7 +16,7 @@
       <type>stp_array_t *</type>
       <name>stp_array_create</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaa3d385d3e2f248b1c1ac88d5f103e9a2</anchor>
+      <anchor>ga33314ccd4033c4a8ee0907b7cf913f3a</anchor>
       <arglist>(int x_size, int y_size)</arglist>
     </member>
     <member kind="function">
@@ -37,7 +37,7 @@
       <type>stp_array_t *</type>
       <name>stp_array_create_copy</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gad0b50228ca40df79196197f9c21f4b56</anchor>
+      <anchor>gaf34342c0070224a74c36ec39a71322ff</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
@@ -86,7 +86,7 @@
       <type>const stp_sequence_t *</type>
       <name>stp_array_get_sequence</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gae05ba5cfe8c03e2435348d6c5488d87e</anchor>
+      <anchor>gaae059b3629e413fe480ea7c663e53b09</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
@@ -100,35 +100,35 @@
       <type>char *</type>
       <name>stp_array_write_string</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>ga1e2262c54ced078e6e5e38113aeeddf5</anchor>
+      <anchor>gae707a88ef4003cfc2f2406bfc1504286</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_stream</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>ga497c7ee10ce8d0f90a7289d4f81688ce</anchor>
+      <anchor>ga1a0372963b8d36405303f4da6675c056</anchor>
       <arglist>(FILE *fp)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_file</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaf481883d42f37cba19a2d7463b29ac7b</anchor>
+      <anchor>gab7afd1a2001776f30d82e35243eebc61</anchor>
       <arglist>(const char *file)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_string</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaeb16e8b11cb35960bbacb5131bf15f43</anchor>
+      <anchor>ga12e226086beb3c33590ee0b5c2efc279</anchor>
       <arglist>(const char *string)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>bit-ops.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>bit-ops_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>bit-ops_8h.html</filename>
     <member kind="function">
       <type>void</type>
       <name>stp_fold</name>
@@ -223,8 +223,8 @@
   </compound>
   <compound kind="file">
     <name>channel.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>channel_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>channel_8h.html</filename>
     <member kind="function">
       <type>void</type>
       <name>stp_channel_reset</name>
@@ -348,7 +348,7 @@
       <type>const stp_curve_t *</type>
       <name>stp_channel_get_curve</name>
       <anchorfile>channel_8h.html</anchorfile>
-      <anchor>a36feed643e8768ff93308980203a92be</anchor>
+      <anchor>a2ac5eb56fa5701cfc0f44c232c98c3c7</anchor>
       <arglist>(stp_vars_t *v, int channel)</arglist>
     </member>
     <member kind="function">
@@ -362,7 +362,7 @@
       <type>const stp_curve_t *</type>
       <name>stp_channel_get_gcr_curve</name>
       <anchorfile>channel_8h.html</anchorfile>
-      <anchor>ac5c6578307d574f53c8f9110053fe9c5</anchor>
+      <anchor>ac18627025a4d35f74ea4362307cbc13a</anchor>
       <arglist>(stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -383,35 +383,35 @@
       <type>unsigned short *</type>
       <name>stp_channel_get_input</name>
       <anchorfile>channel_8h.html</anchorfile>
-      <anchor>ac73acbaeb300c75912529c5064ea507a</anchor>
+      <anchor>ab8877e9193d6c1ba15d61b9b6b4686ee</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>unsigned short *</type>
       <name>stp_channel_get_output</name>
       <anchorfile>channel_8h.html</anchorfile>
-      <anchor>a3ad58abee1208b328da69e49d230a54f</anchor>
+      <anchor>a85e3a397c30c5e6c8b7d9b776e92984c</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>unsigned char *</type>
       <name>stp_channel_get_output_8bit</name>
       <anchorfile>channel_8h.html</anchorfile>
-      <anchor>a0abc4160dc84b35c884ba4d8ebfcbbfd</anchor>
+      <anchor>a9f919850606981df141853eddc3b7a34</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>color.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>color_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>color_8h.html</filename>
     <class kind="struct">stp_colorfuncs_t</class>
     <class kind="struct">stp_color</class>
     <member kind="typedef">
       <type>struct stp_color</type>
       <name>stp_color_t</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>gad1408f9835b72f266ec7c7e1e1202a74</anchor>
+      <anchor>ga4ae91ac7188774f43487dd0ae545099a</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -467,42 +467,42 @@
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga3b8f62108f3604480e7b89b253527f4a</anchor>
+      <anchor>gac07538c92894938f97138c2967ec05ee</anchor>
       <arglist>(const char *name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_index</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga68ba525119da39ae854645ae649557d3</anchor>
+      <anchor>ga1427eaf67c191b219c8a9cc2ecd2dd86</anchor>
       <arglist>(int idx)</arglist>
     </member>
     <member kind="function">
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_colorfuncs</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga578f80b2bc3937df38ce7e803f5f472c</anchor>
+      <anchor>gaa9ec9842aef9c741faddd86da6b9ce06</anchor>
       <arglist>(stp_colorfuncs_t *colorfuncs)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_color_get_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga5a4a4da67cb5c3f1c0a2a9618e46ed50</anchor>
+      <anchor>ga643152ae67df4e50c8db59ee28eb7674</anchor>
       <arglist>(const stp_color_t *c)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_color_get_long_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga612389b45f09358f6bad0e376c91b057</anchor>
+      <anchor>ga62418b53c63f9ff33cf2cfb03628badd</anchor>
       <arglist>(const stp_color_t *c)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>curve-cache.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>curve-cache_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>curve-cache_8h.html</filename>
     <includes id="curve_8h" name="curve.h" local="no" imported="no">gutenprint/curve.h</includes>
     <class kind="struct">stp_cached_curve_t</class>
     <member kind="define">
@@ -544,7 +544,7 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_cache_get_curve</name>
       <anchorfile>curve-cache_8h.html</anchorfile>
-      <anchor>a26161d0b2b6c8b97e0de2dc12619cc6c</anchor>
+      <anchor>a8a535b1f435fc8ac3060e14c35ee2520</anchor>
       <arglist>(stp_cached_curve_t *cache)</arglist>
     </member>
     <member kind="function">
@@ -579,14 +579,14 @@
       <type>const unsigned short *</type>
       <name>stp_curve_cache_get_ushort_data</name>
       <anchorfile>curve-cache_8h.html</anchorfile>
-      <anchor>a204df5bd2ecc318cccf6e2541d8b4830</anchor>
+      <anchor>acb55844f6b72edb9e61b9c37fe0afba4</anchor>
       <arglist>(stp_cached_curve_t *cache)</arglist>
     </member>
     <member kind="function">
       <type>const double *</type>
       <name>stp_curve_cache_get_double_data</name>
       <anchorfile>curve-cache_8h.html</anchorfile>
-      <anchor>a45415b5aa0600b60b65880803aea84b4</anchor>
+      <anchor>a91220d17849a839c3f2af083a33acfa4</anchor>
       <arglist>(stp_cached_curve_t *cache)</arglist>
     </member>
     <member kind="function">
@@ -599,8 +599,8 @@
   </compound>
   <compound kind="file">
     <name>curve.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>curve_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>curve_8h.html</filename>
     <includes id="sequence_8h" name="sequence.h" local="no" imported="no">gutenprint/sequence.h</includes>
     <class kind="struct">stp_curve_point_t</class>
     <member kind="typedef">
@@ -702,14 +702,14 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_create</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga6b3640f0e25bd9d38e46bdc1b2ee58a4</anchor>
+      <anchor>ga87c2abb4c105236caeda6ff92923778c</anchor>
       <arglist>(stp_curve_wrap_mode_t wrap)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_copy</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga972ed591394396e0c66e928a0695b3bf</anchor>
+      <anchor>gade693de34b184befb4b66a65fafb48c1</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -723,7 +723,7 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_create_reverse</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga8c2aed234d3e4ddc4c239801be17bb73</anchor>
+      <anchor>ga315482813f48b16be512f225ce69ded6</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -863,7 +863,7 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_get_subrange</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga5cbf7c4b6ad96ecb35fc06f46c0319f0</anchor>
+      <anchor>gab477b6f7be5794b78d8aa1479176ef1b</anchor>
       <arglist>(const stp_curve_t *curve, size_t start, size_t count)</arglist>
     </member>
     <member kind="function">
@@ -877,70 +877,70 @@
       <type>const double *</type>
       <name>stp_curve_get_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gab2208f56694e47e4300d10e057f59ee8</anchor>
+      <anchor>ga57bacd29cb4eeef9000ca6f444cf19c1</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const stp_curve_point_t *</type>
       <name>stp_curve_get_data_points</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga79e0d6afa3573917c756af64b56a0d82</anchor>
+      <anchor>gab9f17b739570c1a82503b9d6d9eddc3d</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const float *</type>
       <name>stp_curve_get_float_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga251f105cb5f2b126ea02b7908f717c18</anchor>
+      <anchor>gaf8acb14ba132e0c62e6ee7207615ba11</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const long *</type>
       <name>stp_curve_get_long_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaf59bd38c9dfc7beb08a283dc9e400bf2</anchor>
+      <anchor>gad1d9c2c86ae7f8c9de4cb095dd9e819b</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned long *</type>
       <name>stp_curve_get_ulong_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga24a862eda4cdbb626f51aeb7d8ae9a50</anchor>
+      <anchor>gacbe68f737cc5388e27c2198166fdc12e</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const int *</type>
       <name>stp_curve_get_int_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga6de80e81b64262e0051441f697ae4de4</anchor>
+      <anchor>gab1da93b31073d22e25cc67da477a7b96</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned int *</type>
       <name>stp_curve_get_uint_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga19b3160a57dc6959fe08c631c7206a8a</anchor>
+      <anchor>gafc85f2230248e30b38b96464589b1017</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const short *</type>
       <name>stp_curve_get_short_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga87c5d1904efa58be8a21ab6b2c41d0b9</anchor>
+      <anchor>gad38136704a9f0761ed4b1295983ac6ba</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned short *</type>
       <name>stp_curve_get_ushort_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaa02125af6b9c192e34985851370391b8</anchor>
+      <anchor>gabd1eba1f9531b9c590a7bef3aa55cba4</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const stp_sequence_t *</type>
       <name>stp_curve_get_sequence</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gade323594e84d4380c88ecf122a5a4da8</anchor>
+      <anchor>ga2647fee9eb719635f8d0599984f3531b</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -1003,28 +1003,28 @@
       <type>char *</type>
       <name>stp_curve_write_string</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaf2f0da590278ff74af1eccb0aa0c7169</anchor>
+      <anchor>ga43d2a48601fe341a90fd4ede77bc3bee</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_stream</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga478a24e44a3ce345f7207cf7ded12e37</anchor>
+      <anchor>gad04e42c2e4fa598d5d4aad7f2e47a33f</anchor>
       <arglist>(FILE *fp)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_file</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gad96d7d1cda5f037f7d6a9b651ebbbb46</anchor>
+      <anchor>ga2710ab80726552eecba9c4f8d53268bb</anchor>
       <arglist>(const char *file)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_string</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gab8c0df217306a6e0597f058efbfaca82</anchor>
+      <anchor>ga31699ef1132b2b175202a13c614c30bc</anchor>
       <arglist>(const char *string)</arglist>
     </member>
     <member kind="function">
@@ -1037,8 +1037,8 @@
   </compound>
   <compound kind="file">
     <name>dither.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>dither_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>dither_8h.html</filename>
     <class kind="struct">stp_dither_matrix_short</class>
     <class kind="struct">stp_dither_matrix_normal</class>
     <class kind="struct">stp_dither_matrix_generic</class>
@@ -1084,42 +1084,42 @@
       <type>struct stp_dither_matrix_short</type>
       <name>stp_dither_matrix_short_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>a9a2c54a4730e2c9bb25cf95f6cd3e597</anchor>
+      <anchor>aab05da6a1dae31f82ac3047e214207df</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_dither_matrix_normal</type>
       <name>stp_dither_matrix_normal_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>afebf0484e151cf3cce4ef0b9911d0022</anchor>
+      <anchor>a209dabad59b89d125e7d6d8a9e84f9a8</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_dither_matrix_generic</type>
       <name>stp_dither_matrix_generic_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>a9f5f63d4f792df1d7becccf3fb5c8fdd</anchor>
+      <anchor>aed9204211553f43b7148f6dfb87025d6</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct dither_matrix_impl</type>
       <name>stp_dither_matrix_impl_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>af823fed10cb9591c0e659033ec49f55f</anchor>
+      <anchor>afdcca3b2147e0930def8484335b40f2b</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_dotsize</type>
       <name>stp_dotsize_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>a7a74b9371fd47b48d961d2316e2126e4</anchor>
+      <anchor>a1468ba289107bab71e238182ae7b429b</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_shade</type>
       <name>stp_shade_t</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>a5baefb325bf92b7ca10c2d057c04b835</anchor>
+      <anchor>a4288084ca0781c2bbab87b237878a009</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -1203,7 +1203,7 @@
       <type>stp_array_t *</type>
       <name>stp_find_standard_dither_array</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>ac523d1ba539398308a7ea83f4188d6ae</anchor>
+      <anchor>ade4225d774d4be54068c7be760d452ae</anchor>
       <arglist>(int x_aspect, int y_aspect)</arglist>
     </member>
     <member kind="function">
@@ -1322,7 +1322,7 @@
       <type>unsigned char *</type>
       <name>stp_dither_get_channel</name>
       <anchorfile>dither_8h.html</anchorfile>
-      <anchor>a8866521ed5c139e2048e5548cc4fb43f</anchor>
+      <anchor>aa9c78e644bed91986df96c50593e0aa8</anchor>
       <arglist>(stp_vars_t *v, unsigned channel, unsigned subchannel)</arglist>
     </member>
     <member kind="function">
@@ -1342,8 +1342,8 @@
   </compound>
   <compound kind="file">
     <name>gutenprint-intl-internal.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>gutenprint-intl-internal_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>gutenprint-intl-internal_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>textdomain</name>
@@ -1396,8 +1396,8 @@
   </compound>
   <compound kind="file">
     <name>gutenprint-intl.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>gutenprint-intl_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>gutenprint-intl_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>textdomain</name>
@@ -1450,8 +1450,8 @@
   </compound>
   <compound kind="file">
     <name>gutenprint-module.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>gutenprint-module_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>gutenprint-module_8h.html</filename>
     <includes id="gutenprint_8h" name="gutenprint.h" local="no" imported="no">gutenprint/gutenprint.h</includes>
     <includes id="bit-ops_8h" name="bit-ops.h" local="no" imported="no">gutenprint/bit-ops.h</includes>
     <includes id="channel_8h" name="channel.h" local="no" imported="no">gutenprint/channel.h</includes>
@@ -1472,8 +1472,8 @@
   </compound>
   <compound kind="file">
     <name>gutenprint-version.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>gutenprint-version_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>gutenprint-version_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>STP_MAJOR_VERSION</name>
@@ -1527,7 +1527,7 @@
       <type>const char *</type>
       <name>stp_check_version</name>
       <anchorfile>group__version.html</anchorfile>
-      <anchor>ga05a93cb4ac52cc50875b5839c59bcafc</anchor>
+      <anchor>ga530c20a9e4d5b008c7934b1c113dc922</anchor>
       <arglist>(unsigned int required_major, unsigned int required_minor, unsigned int required_micro)</arglist>
     </member>
     <member kind="variable">
@@ -1575,8 +1575,8 @@
   </compound>
   <compound kind="file">
     <name>gutenprint.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>gutenprint_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>gutenprint_8h.html</filename>
     <includes id="array_8h" name="array.h" local="no" imported="no">gutenprint/array.h</includes>
     <includes id="curve_8h" name="curve.h" local="no" imported="no">gutenprint/curve.h</includes>
     <includes id="gutenprint-version_8h" name="gutenprint-version.h" local="no" imported="no">gutenprint/gutenprint-version.h</includes>
@@ -1591,8 +1591,8 @@
   </compound>
   <compound kind="file">
     <name>image.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>image_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>image_8h.html</filename>
     <includes id="types_8h" name="types.h" local="no" imported="no">gutenprint/types.h</includes>
     <class kind="struct">stp_image</class>
     <member kind="define">
@@ -1606,7 +1606,7 @@
       <type>struct stp_image</type>
       <name>stp_image_t</name>
       <anchorfile>group__image.html</anchorfile>
-      <anchor>gaae0b5ef92b619849a51cb75d376a90fb</anchor>
+      <anchor>gac9735a3743a64e43a6fd0fb300a11ae1</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -1667,7 +1667,7 @@
       <type>const char *</type>
       <name>stp_image_get_appname</name>
       <anchorfile>group__image.html</anchorfile>
-      <anchor>ga1643f6b9eb180e98f3c1c267950f18d2</anchor>
+      <anchor>ga935fb7504afeb551cf28945cb59415c2</anchor>
       <arglist>(stp_image_t *image)</arglist>
     </member>
     <member kind="function">
@@ -1680,8 +1680,8 @@
   </compound>
   <compound kind="file">
     <name>list.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>list_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>list_8h.html</filename>
     <member kind="typedef">
       <type>struct stp_list_item</type>
       <name>stp_list_item_t</name>
@@ -1707,14 +1707,14 @@
       <type>void *(*</type>
       <name>stp_node_copyfunc</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gacc52db9cbfb5090120e0ee8a24c396f2</anchor>
+      <anchor>ga5c44f9a1b6a21f13a339298a3f38817a</anchor>
       <arglist>)(const void *)</arglist>
     </member>
     <member kind="typedef">
       <type>const char *(*</type>
       <name>stp_node_namefunc</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga278b6a7d80911974bba5fb3db5bd0146</anchor>
+      <anchor>gad094dc048e2febb12c6e3c3ab0219da6</anchor>
       <arglist>)(const void *)</arglist>
     </member>
     <member kind="typedef">
@@ -1735,14 +1735,14 @@
       <type>stp_list_t *</type>
       <name>stp_list_create</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga3cfea94cd07f50d7d9b4ce384d349fca</anchor>
+      <anchor>ga41f4fa9884eefc8294c418a48eb8bbaf</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_t *</type>
       <name>stp_list_copy</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga0ba249dd06efbf5c0af8511ceab671e8</anchor>
+      <anchor>gacd7fa1c8ed8247f7252764a7418bad76</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
@@ -1756,35 +1756,35 @@
       <type>stp_list_item_t *</type>
       <name>stp_list_get_start</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad185100e8d7969a473e9d42bc8084572</anchor>
+      <anchor>ga5be4023b77ec6b83ef123dbf0199203c</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_end</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gae939f15ee1a6e4c0aaad7a7be7f40b74</anchor>
+      <anchor>gae0c30c0f6dced76cf2aba02096c399e7</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_index</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad377973e8b13d02c9c111d970f491993</anchor>
+      <anchor>gafed62244b97b534e00ec6392649ed1f9</anchor>
       <arglist>(const stp_list_t *list, int idx)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_name</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga729867c847dd8282f74806968c708f28</anchor>
+      <anchor>ga1a22c464c35b072fc4fb80e3f549dbef</anchor>
       <arglist>(const stp_list_t *list, const char *name)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_long_name</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gacc9140df3f4311cd750ba10a1cbf37d1</anchor>
+      <anchor>ga40fb6fc8eb3bd9dea9fa2ee302411d7e</anchor>
       <arglist>(const stp_list_t *list, const char *long_name)</arglist>
     </member>
     <member kind="function">
@@ -1882,21 +1882,21 @@
       <type>stp_list_item_t *</type>
       <name>stp_list_item_prev</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gabaa2a241055402438a0cae6f40cf6a78</anchor>
+      <anchor>gac5524e26c661b427b04a02ed62c7f517</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_item_next</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga81ab310caf6432ce1e492eaafdb6c0d7</anchor>
+      <anchor>gacc16f5650e7f91737c97042b5889e600</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_list_item_get_data</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad6f6b303b40fa75f22a86391785178cb</anchor>
+      <anchor>ga2f41b7e55f350d6cdfccff0c0588e827</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
@@ -1909,8 +1909,8 @@
   </compound>
   <compound kind="file">
     <name>module.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>module_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>module_8h.html</filename>
     <includes id="list_8h" name="list.h" local="no" imported="no">gutenprint/list.h</includes>
     <class kind="struct">stp_module_version</class>
     <class kind="struct">stp_module</class>
@@ -1918,14 +1918,14 @@
       <type>struct stp_module_version</type>
       <name>stp_module_version_t</name>
       <anchorfile>module_8h.html</anchorfile>
-      <anchor>a753a8450e5ac6b73134c12b89533f16e</anchor>
+      <anchor>a1b8353153d6fbdca1a6c1d8a026f819e</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_module</type>
       <name>stp_module_t</name>
       <anchorfile>module_8h.html</anchorfile>
-      <anchor>ae1e92953e8ffaa00cfbf7fc01e51f36d</anchor>
+      <anchor>a755275a8aa135b1cbaab8cf1d5d78e52</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -2004,14 +2004,14 @@
       <type>stp_list_t *</type>
       <name>stp_module_get_class</name>
       <anchorfile>module_8h.html</anchorfile>
-      <anchor>a5eee8809d0134f4e7540bc5552bccd7f</anchor>
+      <anchor>afa5c29c6e2886d3caac090b40e06fe80</anchor>
       <arglist>(stp_module_class_t class)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>mxml.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>mxml_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>mxml_8h.html</filename>
     <includes id="types_8h" name="types.h" local="no" imported="no">gutenprint/types.h</includes>
     <class kind="struct">stp_mxml_attr_s</class>
     <class kind="struct">stp_mxml_value_s</class>
@@ -2120,35 +2120,35 @@
       <type>enum stp_mxml_type_e</type>
       <name>stp_mxml_type_t</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a3ff7086c4e8f1557e81c32a61420017e</anchor>
+      <anchor>a9af02d5a16c038fd409f6d0882b8ee47</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_mxml_attr_s</type>
       <name>stp_mxml_attr_t</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>ab271ad8c2bb8d7e6b4b453ffe5589564</anchor>
+      <anchor>a0e7de110848101bcdad4d68d6d8394ac</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_mxml_value_s</type>
       <name>stp_mxml_element_t</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a70e20b752807f49a56b56d80ee470b47</anchor>
+      <anchor>a46a85b381159de3c283bb009f4ab100f</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>struct stp_mxml_text_s</type>
       <name>stp_mxml_text_t</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>ab9c0236a2d70c3bcb210a9f6fadf00a3</anchor>
+      <anchor>a9941879fddab1d5c53c73119da41a466</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>union stp_mxml_value_u</type>
       <name>stp_mxml_value_t</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a9a2e2ffccac3c73524e76f3e816d35bf</anchor>
+      <anchor>acb6b30a69e827a8951255ba40b4694f2</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
@@ -2219,7 +2219,7 @@
       <type>const char *</type>
       <name>stp_mxmlElementGetAttr</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>ac60696919428e3b2e34ee8e2eb110962</anchor>
+      <anchor>ad4f54fd501560356529bf40adb3a25e8</anchor>
       <arglist>(stp_mxml_node_t *node, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -2233,77 +2233,77 @@
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlFindElement</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a65c27e9c331c88b3f010f040591cc401</anchor>
+      <anchor>a2a0c2154064895a8248294515a2c76c6</anchor>
       <arglist>(stp_mxml_node_t *node, stp_mxml_node_t *top, const char *name, const char *attr, const char *value, int descend)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlLoadFile</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a88f8bf556fb254728ab23ce931ee9224</anchor>
+      <anchor>a42d3d50570ffc618e6a6d3eb26f96b59</anchor>
       <arglist>(stp_mxml_node_t *top, FILE *fp, stp_mxml_type_t(*cb)(stp_mxml_node_t *))</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlLoadFromFile</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a7fbf0906a36fe755779077efd7126704</anchor>
+      <anchor>af5647a8d3173c7ce0a23d3676c5c2224</anchor>
       <arglist>(stp_mxml_node_t *top, const char *file, stp_mxml_type_t(*cb)(stp_mxml_node_t *))</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlLoadString</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a4a2465973559fe7815386d0d59d9a8ee</anchor>
+      <anchor>a084cdba27ec3c5ea869538f1b74e3fbf</anchor>
       <arglist>(stp_mxml_node_t *top, const char *s, stp_mxml_type_t(*cb)(stp_mxml_node_t *))</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewElement</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a9430b1f2b1d6b6060d9e358309de3772</anchor>
+      <anchor>a9da0387efea2dcd766df003b6a0e50da</anchor>
       <arglist>(stp_mxml_node_t *parent, const char *name)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewInteger</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>acefddfa295df71e8617b607d207980eb</anchor>
+      <anchor>ac01b5840cad0a5bf70fb6f4a367491ea</anchor>
       <arglist>(stp_mxml_node_t *parent, int integer)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewOpaque</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a1897cb8faa2141879d45d9fec0463119</anchor>
+      <anchor>aa9906f4c4f2a836be3055a212cc147c8</anchor>
       <arglist>(stp_mxml_node_t *parent, const char *opaque)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewReal</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a1b4b2ee1a0c75a31981d70e35398d6dd</anchor>
+      <anchor>ac66455d9190070d583efc9792077e634</anchor>
       <arglist>(stp_mxml_node_t *parent, double real)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewDimension</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>aa05fdf7cb3b5ad98a0afc4a480d71d6f</anchor>
+      <anchor>a069b0f886318a644e4fa72b0bbcb8df0</anchor>
       <arglist>(stp_mxml_node_t *parent, stp_dimension_t real)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlNewText</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>a05bd9944cadbef034730a53ca47c9f6a</anchor>
+      <anchor>affebe23a7814928efd92f98aafb73eae</anchor>
       <arglist>(stp_mxml_node_t *parent, int whitespace, const char *string)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlParent</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>afa6f19c52b4f937ab65bf0c5642279ff</anchor>
+      <anchor>a431883f5db1d843e464209f167dcc149</anchor>
       <arglist>(stp_mxml_node_t *node)</arglist>
     </member>
     <member kind="function">
@@ -2317,7 +2317,7 @@
       <type>char *</type>
       <name>stp_mxmlSaveAllocString</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>ade7e653595e3ea46d9f3b5545d0a10ea</anchor>
+      <anchor>ac6aa5fb2a64f2f40ddbed0d6ea7a40fd</anchor>
       <arglist>(stp_mxml_node_t *node, int(*cb)(stp_mxml_node_t *, int))</arglist>
     </member>
     <member kind="function">
@@ -2345,21 +2345,21 @@
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlWalkNext</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>af478d00f31cfae58314bd6f40531923b</anchor>
+      <anchor>a8c5f85b250ee79007b877ca83e4109ee</anchor>
       <arglist>(stp_mxml_node_t *node, stp_mxml_node_t *top, int descend)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_mxmlWalkPrev</name>
       <anchorfile>mxml_8h.html</anchorfile>
-      <anchor>acc0525bdade1c9e0e83c154592fe815c</anchor>
+      <anchor>ad7fedc2a03aa179a8b369e6cec6e9dac</anchor>
       <arglist>(stp_mxml_node_t *node, stp_mxml_node_t *top, int descend)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>paper.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>paper_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>paper_8h.html</filename>
     <includes id="types_8h" name="types.h" local="no" imported="no">gutenprint/types.h</includes>
     <includes id="vars_8h" name="vars.h" local="no" imported="no">gutenprint/vars.h</includes>
     <class kind="struct">stp_papersize_t</class>
@@ -2417,7 +2417,7 @@
       <type>const stp_papersize_t *</type>
       <name>stp_describe_papersize</name>
       <anchorfile>group__papersize.html</anchorfile>
-      <anchor>gaa1030bc16945705116695eedf09ecd17</anchor>
+      <anchor>gab3a86ea20d95e53a7b0d9f427fdc7f98</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -2430,13 +2430,13 @@
   </compound>
   <compound kind="file">
     <name>path.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>path_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>path_8h.html</filename>
     <member kind="function">
       <type>stp_list_t *</type>
       <name>stp_path_search</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>ab1754e7b09717741f4bdc7a4b973d4a5</anchor>
+      <anchor>a2bb429ddb5a9b97c288652833270b9be</anchor>
       <arglist>(stp_list_t *dirlist, const char *suffix)</arglist>
     </member>
     <member kind="function">
@@ -2450,42 +2450,42 @@
       <type>stp_list_t *</type>
       <name>stp_generate_path</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>a6e2d4cfced3009f5ad60f8b2b0328c28</anchor>
+      <anchor>abd467fc8560a48819191fb3f65774075</anchor>
       <arglist>(const char *path)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_t *</type>
       <name>stp_data_path</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>adcce49e50d50319f62464bee80a80348</anchor>
+      <anchor>a12d71eb1c37f667fb42d18f44f2ec214</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_t *</type>
       <name>stpi_list_files_on_data_path</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>a037cae76d9cb1916ec7fa711a127fe54</anchor>
+      <anchor>a9788b2fa14bd2b55ce2130a4274f032c</anchor>
       <arglist>(const char *name)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stpi_path_merge</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>a17eca69c41eb6cca959ab47e3c1a3aa2</anchor>
+      <anchor>a86e0560c1d57e7dc40e888acb65e4312</anchor>
       <arglist>(const char *path, const char *file)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_path_find_file</name>
       <anchorfile>path_8h.html</anchorfile>
-      <anchor>a87477ad678797441f2b8f0fd9d160d58</anchor>
+      <anchor>ac29bc69143f51492da3be9c403d7d2ed</anchor>
       <arglist>(const char *path, const char *file)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>printers.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>printers_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>printers_8h.html</filename>
     <includes id="types_8h" name="types.h" local="no" imported="no">gutenprint/types.h</includes>
     <includes id="string-list_8h" name="string-list.h" local="no" imported="no">gutenprint/string-list.h</includes>
     <includes id="list_8h" name="list.h" local="no" imported="no">gutenprint/list.h</includes>
@@ -2508,35 +2508,35 @@
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_index</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga440501ca226e0a9ac1335c7e52ee55a6</anchor>
+      <anchor>ga401919f87c978373d723591570f69ccc</anchor>
       <arglist>(int idx)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_long_name</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga6bd5abd876100c17fc9029659fed92f4</anchor>
+      <anchor>ga1001b83f79230791af6119d7290f535d</anchor>
       <arglist>(const char *long_name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_driver</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gae45de9ef94fb609c2a54f1d80144552e</anchor>
+      <anchor>ga5e8bc0e8e092c49a66d9c4325895ad7c</anchor>
       <arglist>(const char *driver)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_device_id</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gadce65b83e3dd0ffcb75591ed3ba81155</anchor>
+      <anchor>gaf7e9e4dff576b922067c9151b486fdc6</anchor>
       <arglist>(const char *device_id)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gac649c4b3d0a93f26f99deb4b081305c1</anchor>
+      <anchor>ga1c5a3fea2c449a136435f83fb3d5f2f4</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -2550,42 +2550,42 @@
       <type>const char *</type>
       <name>stp_printer_get_long_name</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga11804fb9b8d87ed1f2a3acbd39f5f85a</anchor>
+      <anchor>ga088c9cbd04b26080b23656a07e930f64</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_driver</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gac345b8cf8cd78da98fdb4c6b2d9cf7ca</anchor>
+      <anchor>gac938a15e0d777d38120a6bf6ba6bd46f</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_device_id</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga7bbd6440baa533d99616eccb5f449354</anchor>
+      <anchor>ga4f8d490cddff197d687d6d0468c8e8fd</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_family</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga487b74bf101a842f30b5941b8db4769a</anchor>
+      <anchor>ga7f01dafbd0b27700a707bdc885e8056e</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_manufacturer</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gab99dd05c42aed848d1567f2b346fb4f4</anchor>
+      <anchor>ga515ab73e0868bcf4adaed0e1e6f6af78</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_comment</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga04564fc764774143b2e5924c40c6e271</anchor>
+      <anchor>ga3ec8a415db669e79a2fd5ef4b0a32761</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
@@ -2599,7 +2599,7 @@
       <type>const stp_vars_t *</type>
       <name>stp_printer_get_defaults</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga4f6859e0f21ed2062075d6b9f680a202</anchor>
+      <anchor>gafca950361d996aee7b19a7cb88534d5a</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
@@ -2641,7 +2641,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_get_external_options</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gaae7a50e6175eed1b84d2e20c924b33ca</anchor>
+      <anchor>gae3c87779c0ac5a7258acc7ff94215aa4</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -2683,14 +2683,14 @@
       <type>const char *</type>
       <name>stp_describe_output</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga50b48bab8d6d1734c3a0f6622d65582e</anchor>
+      <anchor>ga299d0f36a68094049a8bc7765587dfb5</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>refcache.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>refcache_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>refcache_8h.html</filename>
     <includes id="string-list_8h" name="string-list.h" local="no" imported="no">gutenprint/string-list.h</includes>
     <member kind="function">
       <type>int</type>
@@ -2703,7 +2703,7 @@
       <type>void *</type>
       <name>stp_refcache_find_item</name>
       <anchorfile>refcache_8h.html</anchorfile>
-      <anchor>a876b775bddce2f266bae409947d71598</anchor>
+      <anchor>a06524861092f61ebea705a6d55aefad7</anchor>
       <arglist>(const char *cache, const char *item)</arglist>
     </member>
     <member kind="function">
@@ -2738,21 +2738,21 @@
       <type>const stp_string_list_t *</type>
       <name>stp_refcache_list_caches</name>
       <anchorfile>refcache_8h.html</anchorfile>
-      <anchor>a90792910d4f963063788fdeb37ecadac</anchor>
+      <anchor>a785c07df3779e8d1587f3962418ea726</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>const stp_string_list_t *</type>
       <name>stp_refcache_list_cache_items</name>
       <anchorfile>refcache_8h.html</anchorfile>
-      <anchor>a81aac994927dff8647838e7b3db48f25</anchor>
+      <anchor>a0b7b109cf1e18e66dccf92d2c3504caa</anchor>
       <arglist>(const char *cache)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>sequence.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>sequence_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>sequence_8h.html</filename>
     <member kind="typedef">
       <type>struct stp_sequence</type>
       <name>stp_sequence_t</name>
@@ -2764,7 +2764,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga9f0233f39d6a27c796bb283c80974618</anchor>
+      <anchor>ga98a9784a7085b9728c1c09c48e083015</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -2785,7 +2785,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create_copy</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gab03a34a03ffd4163f51126916d737df7</anchor>
+      <anchor>ga50e959627676fa5b7708d85196c2f767</anchor>
       <arglist>(const stp_sequence_t *sequence)</arglist>
     </member>
     <member kind="function">
@@ -2799,7 +2799,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create_reverse</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gade64193f944aaba0365a96691d479974</anchor>
+      <anchor>ga5c9bee3e48e29bac17913ffc6f2db0db</anchor>
       <arglist>(const stp_sequence_t *sequence)</arglist>
     </member>
     <member kind="function">
@@ -2925,56 +2925,56 @@
       <type>const float *</type>
       <name>stp_sequence_get_float_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gaff096d5b027157151c65978b95d4e29e</anchor>
+      <anchor>ga0c94c327508ed24aa22c1939843045e2</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const long *</type>
       <name>stp_sequence_get_long_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga039d9054cfd0f7d5a892a7fec3f734f4</anchor>
+      <anchor>gadfb5b30fea7feed638271c25b574b867</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned long *</type>
       <name>stp_sequence_get_ulong_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga12f54f27144d490893f46dd1b0037b8b</anchor>
+      <anchor>ga01afc68d2ea4098b30ff14510ba520e6</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const int *</type>
       <name>stp_sequence_get_int_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga01b0bc9e181a097aff3e97254dbfcb14</anchor>
+      <anchor>ga128f73b493f1dee85bd7b1b5903a9e5d</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned int *</type>
       <name>stp_sequence_get_uint_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gae7189582ef9e4d638f909a2b1ee0c1b2</anchor>
+      <anchor>ga144a6580eac5665e7d71e6c636df3c16</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const short *</type>
       <name>stp_sequence_get_short_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga4d1cf137e4a77e9123e2afcdf7d63bec</anchor>
+      <anchor>ga03efc35c1c39b65f356537899e7dae5b</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned short *</type>
       <name>stp_sequence_get_ushort_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga20007077e1d8365a0eddaa922a5967c3</anchor>
+      <anchor>gadd29ab141145e2fd96720a388eb9c02f</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>string-list.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>string-list_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>string-list_8h.html</filename>
     <class kind="struct">stp_param_string_t</class>
     <member kind="typedef">
       <type>struct stp_string_list</type>
@@ -2987,7 +2987,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_string_list_create</name>
       <anchorfile>string-list_8h.html</anchorfile>
-      <anchor>ab964b745d73a6d5e2e141f31941bea42</anchor>
+      <anchor>a3a233daaa882b082f622e6f4c8186d06</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -3001,14 +3001,14 @@
       <type>stp_param_string_t *</type>
       <name>stp_string_list_param</name>
       <anchorfile>string-list_8h.html</anchorfile>
-      <anchor>ae254c1408b96ab6cc373643f1b4d91d0</anchor>
+      <anchor>a3f14e87b022907fb63122ec4bd09c609</anchor>
       <arglist>(const stp_string_list_t *list, size_t element)</arglist>
     </member>
     <member kind="function">
       <type>stp_param_string_t *</type>
       <name>stp_string_list_find</name>
       <anchorfile>string-list_8h.html</anchorfile>
-      <anchor>a0b5f5c20933a0f9c50259de3f16dc649</anchor>
+      <anchor>a554e96267902f46c4067fc928e788272</anchor>
       <arglist>(const stp_string_list_t *list, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -3022,7 +3022,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_string_list_create_copy</name>
       <anchorfile>string-list_8h.html</anchorfile>
-      <anchor>a6318f71fac5645c37e2d353f0881cc5b</anchor>
+      <anchor>a3b05fa1dec4dcacad751be51056a890d</anchor>
       <arglist>(const stp_string_list_t *list)</arglist>
     </member>
     <member kind="function">
@@ -3050,7 +3050,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_string_list_create_from_params</name>
       <anchorfile>string-list_8h.html</anchorfile>
-      <anchor>a4f78d1a53d017db20fe5b690d9362e7a</anchor>
+      <anchor>ac0af177d22b4493f0c298e6bfcdefac8</anchor>
       <arglist>(const stp_param_string_t *list, size_t count)</arglist>
     </member>
     <member kind="function">
@@ -3063,8 +3063,8 @@
   </compound>
   <compound kind="file">
     <name>types.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>types_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>types_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>STP_DABS</name>
@@ -3096,8 +3096,8 @@
   </compound>
   <compound kind="file">
     <name>util.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>util_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>util_8h.html</filename>
     <includes id="curve_8h" name="curve.h" local="no" imported="no">gutenprint/curve.h</includes>
     <includes id="vars_8h" name="vars.h" local="no" imported="no">gutenprint/vars.h</includes>
     <member kind="define">
@@ -3356,7 +3356,7 @@
       <type>void *</type>
       <name>stp_get_global_errdata</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga022fb7959595871a61323b7778a9c107</anchor>
+      <anchor>ga097127091a373fd53348ea5d17209fbf</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -3370,21 +3370,21 @@
       <type>void *</type>
       <name>stp_get_global_dbgdata</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga0b34dbe6fa1029df485b165064b64f85</anchor>
+      <anchor>gab28ce1062ce5c33212d9e7ab1b9f155d</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_set_output_codeset</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga7fcc19f0abdc6513dfba7eaebeb16cb9</anchor>
+      <anchor>ga8b8a70433d6b9e593307207be4840ade</anchor>
       <arglist>(const char *codeset)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_read_and_compose_curves</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gadbe8c167230b49bc10391d2c246e6dc0</anchor>
+      <anchor>ga500ca8423acdb05cd9bc45cd138f8270</anchor>
       <arglist>(const char *s1, const char *s2, stp_curve_compose_t comp, size_t piecewise_point_count)</arglist>
     </member>
     <member kind="function">
@@ -3552,21 +3552,21 @@
       <type>void *</type>
       <name>stp_malloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga86a2976738a237df953655e733c75b3a</anchor>
+      <anchor>gac4e3512be498a3c2d4d7e11ed21d88f7</anchor>
       <arglist>(size_t)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_zalloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gac8fd1a439fa2d8e1ff1a2b104cd0137b</anchor>
+      <anchor>gab43d4ede1b627dc80dc183bac6b5861c</anchor>
       <arglist>(size_t)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_realloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga2420936ab8b3492581f389deea44f58c</anchor>
+      <anchor>ga154195c622faaa1f01d0985c098603f5</anchor>
       <arglist>(void *ptr, size_t)</arglist>
     </member>
     <member kind="function">
@@ -3587,35 +3587,35 @@
       <type>char *</type>
       <name>stp_strndup</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gab026f7022963acd694a8b89e4decbde5</anchor>
+      <anchor>ga158e263d2728afe40f0969452086f1e8</anchor>
       <arglist>(const char *s, int n)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_strdup</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga5c0731867697f555a94b2a1229804381</anchor>
+      <anchor>ga39df354af82bfec584eed91e389cec28</anchor>
       <arglist>(const char *s)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_version</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga1f0797636484393574cb95e667819dc1</anchor>
+      <anchor>ga9b6449064ac66e7ed472c4f7e5b9181f</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_release_version</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga5ba7edc43ed094f32ae7d9158a362a7b</anchor>
+      <anchor>gab6d86a9eae88734a960b8a8d89945f20</anchor>
       <arglist>(void)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>vars.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>vars_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>vars_8h.html</filename>
     <includes id="types_8h" name="types.h" local="no" imported="no">gutenprint/types.h</includes>
     <includes id="array_8h" name="array.h" local="no" imported="no">gutenprint/array.h</includes>
     <includes id="curve_8h" name="curve.h" local="no" imported="no">gutenprint/curve.h</includes>
@@ -3678,7 +3678,7 @@
       <type>void *(*</type>
       <name>stp_copy_data_func_t</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga785dacfaf459d30c8874f2afc1c90d6d</anchor>
+      <anchor>gafb001f0919ec46ebe2bd98e705bfeef1</anchor>
       <arglist>)(void *)</arglist>
     </member>
     <member kind="typedef">
@@ -3915,7 +3915,7 @@
       <type>stp_vars_t *</type>
       <name>stp_vars_create</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga5d641ab7093c9ba82cbd4cfbf904fabc</anchor>
+      <anchor>ga63e789a54ec99a51f72a1ba3c9754dfe</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -3929,7 +3929,7 @@
       <type>stp_vars_t *</type>
       <name>stp_vars_create_copy</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaec00fba49ad08d20890e64773bcdbd48</anchor>
+      <anchor>gaff9d607359cd0ab004efa1e2b3d498df</anchor>
       <arglist>(const stp_vars_t *source)</arglist>
     </member>
     <member kind="function">
@@ -3957,7 +3957,7 @@
       <type>const char *</type>
       <name>stp_get_driver</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga20c45707399ef6fdf6ee8c8209b5c7c0</anchor>
+      <anchor>gadf1a58982840e8c33e978bf758f64f1b</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -3978,7 +3978,7 @@
       <type>const char *</type>
       <name>stp_get_color_conversion</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga2bac9212773ecf603b7667bd0268c23e</anchor>
+      <anchor>ga67f4c78acad208648a1b38f8242655d5</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -4118,7 +4118,7 @@
       <type>void *</type>
       <name>stp_get_outdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga7042b05e0df5b32206d54397429bbac5</anchor>
+      <anchor>ga9b07863fc17bbf3e950a96e4af01fd7b</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -4132,7 +4132,7 @@
       <type>void *</type>
       <name>stp_get_errdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gad08bdcd721d37f52993c1862e25ebaf7</anchor>
+      <anchor>gaa0800913521842915df1a1d47f540971</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -4146,7 +4146,7 @@
       <type>void *</type>
       <name>stp_get_dbgdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaa3c75772969cff226a7da34b7ec0d52e</anchor>
+      <anchor>gacd8cf7dde0fd8a8efd7b62a34de520ea</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -4181,14 +4181,14 @@
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_find</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadcd8062af7b643c734f53c545694d258</anchor>
+      <anchor>gab5d497add463b9547a674b8d26648710</anchor>
       <arglist>(stp_const_parameter_list_t list, const char *name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_list_param</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga70d69ef7dec383004bf4570e57b76e18</anchor>
+      <anchor>gafa6a98d9899b4a95e33f4b02314f27bf</anchor>
       <arglist>(stp_const_parameter_list_t list, size_t item)</arglist>
     </member>
     <member kind="function">
@@ -4244,7 +4244,7 @@
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_find_in_settings</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga6ce39557b61706421232b5f1ac604b1b</anchor>
+      <anchor>gac4b236c8e689fb037166d357b80ad828</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -4412,14 +4412,14 @@
       <type>const char *</type>
       <name>stp_get_string_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gab5b21e5606b8ca755c5eac7774260efa</anchor>
+      <anchor>gaae7195d4847e4ec2e096854225553118</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_file_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga2021992d89c92b10138fb012a9554a08</anchor>
+      <anchor>gab2f50ba86b2473748474c63ef581b241</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
@@ -4454,21 +4454,21 @@
       <type>const stp_curve_t *</type>
       <name>stp_get_curve_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga553dec81dd8b3e5590d963ba72223557</anchor>
+      <anchor>gaa96eb0b7c43f8952201e51e1e4ef4c66</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const stp_array_t *</type>
       <name>stp_get_array_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gac50c216c2d5cd56a9704f48d4338b179</anchor>
+      <anchor>gacf2ba7671be48805bc9ff438584b531a</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const stp_raw_t *</type>
       <name>stp_get_raw_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga9fff6c14a71f5f8ec28620ef64a92fd5</anchor>
+      <anchor>gaf12c210ea01ade9ac2aee21ae4c76ca5</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
@@ -4545,70 +4545,70 @@
       <type>stp_string_list_t *</type>
       <name>stp_list_string_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga110e543418842a6dd79149409620bf13</anchor>
+      <anchor>ga841b43e950778a668e4aa015f220d557</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_file_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga76c7e033078e6c2fa276ee72ca97c63c</anchor>
+      <anchor>ga7ffb2adcf5f44b64ae8ab4b9690ec976</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_float_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadec4183ce240188ed18fdc21d9b518f7</anchor>
+      <anchor>ga2aa3ea416f7d5f0f83bcb6f49bcd871e</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_int_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gae08d29a439b77219f32d037ab5b191f5</anchor>
+      <anchor>ga5bb539833e81dfa1fb8475ff24f4506e</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_dimension_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga5cae4a118badc7c52e5f7b7543c83d8e</anchor>
+      <anchor>gafc8dfc0c9e107d46b0608c69301d0031</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_boolean_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga60f98e23144fd1bf5aa53def670b2c91</anchor>
+      <anchor>ga388bc8e8facabe39876001c73a02ed09</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_curve_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga1329d614d6cd18fc6c244b020e26b081</anchor>
+      <anchor>ga9f3ffa8bfc47d5303f09c9082c26db7f</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_array_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga16d23d59368e907a29719f0902ea75fe</anchor>
+      <anchor>gae0d8fc1ce35c5e73ba3cc2e022138e83</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_raw_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga4d06ccaf72d08800f7eb78b3293f4a00</anchor>
+      <anchor>ga91c4710df5ce5c0d03d895a0389bafdf</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga27864133bc2159d1472cbdfb3b781c27</anchor>
+      <anchor>ga576ee9d7ebe66ee4b2537268d7a5e808</anchor>
       <arglist>(const stp_vars_t *v, stp_parameter_type_t type)</arglist>
     </member>
     <member kind="function">
@@ -4867,14 +4867,14 @@
       <type>const stp_vars_t *</type>
       <name>stp_default_settings</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaf63982a6e44f8b62532346d9ceb3d91c</anchor>
+      <anchor>ga447e540a84c3926482c5bbc3c92522a9</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_parameter_get_category</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadb64d444ebed8ec698ce949f8a1aae4b</anchor>
+      <anchor>ga0e392f6e79690db8f7ec5ba13d80d196</anchor>
       <arglist>(const stp_vars_t *v, const stp_parameter_t *desc, const char *category)</arglist>
     </member>
     <member kind="function">
@@ -4888,7 +4888,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_parameter_get_categories</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gad87a41146ef226c77cb8dc4993e40863</anchor>
+      <anchor>ga6b2c713321b9303fc6d442a1c12214f1</anchor>
       <arglist>(const stp_vars_t *v, const stp_parameter_t *desc)</arglist>
     </member>
     <member kind="function">
@@ -4909,7 +4909,7 @@
       <type>void *</type>
       <name>stp_get_component_data</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga1666dd1571bdb866a85d4318858893be</anchor>
+      <anchor>gaa2dc20cc1a030b4f646b8bc02c685d03</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -4950,8 +4950,8 @@
   </compound>
   <compound kind="file">
     <name>weave.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>weave_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>weave_8h.html</filename>
     <class kind="struct">stp_weave_t</class>
     <class kind="struct">stp_pass_t</class>
     <class kind="struct">stp_lineoff_t</class>
@@ -5062,35 +5062,35 @@
       <type>stp_lineoff_t *</type>
       <name>stp_get_lineoffsets_by_pass</name>
       <anchorfile>weave_8h.html</anchorfile>
-      <anchor>a986bb835225820c68d85041e797cf2a5</anchor>
+      <anchor>a9d7210f152d4304389e4220c8735f9ba</anchor>
       <arglist>(const stp_vars_t *v, int pass)</arglist>
     </member>
     <member kind="function">
       <type>stp_lineactive_t *</type>
       <name>stp_get_lineactive_by_pass</name>
       <anchorfile>weave_8h.html</anchorfile>
-      <anchor>a4c7e67ed92ac3427c94fb0e6a85bfce9</anchor>
+      <anchor>a43f2d14faaf00ac8e3cfd3315c72f039</anchor>
       <arglist>(const stp_vars_t *v, int pass)</arglist>
     </member>
     <member kind="function">
       <type>stp_linecount_t *</type>
       <name>stp_get_linecount_by_pass</name>
       <anchorfile>weave_8h.html</anchorfile>
-      <anchor>a5acdf7cc603254e68b0ae39e45ea52f3</anchor>
+      <anchor>a446d20922e04764f594e5f8fae5c5a76</anchor>
       <arglist>(const stp_vars_t *v, int pass)</arglist>
     </member>
     <member kind="function">
       <type>const stp_linebufs_t *</type>
       <name>stp_get_linebases_by_pass</name>
       <anchorfile>weave_8h.html</anchorfile>
-      <anchor>a1ec75a70b7dad8a5d0e4c963d67677c3</anchor>
+      <anchor>a840054c9e50eae6df8065f5e539731b1</anchor>
       <arglist>(const stp_vars_t *v, int pass)</arglist>
     </member>
     <member kind="function">
       <type>stp_pass_t *</type>
       <name>stp_get_pass_by_pass</name>
       <anchorfile>weave_8h.html</anchorfile>
-      <anchor>a5412630e5a7ba809b6ef84ab4e6c9f09</anchor>
+      <anchor>aeac76e94d0592e422aa618fda38db564</anchor>
       <arglist>(const stp_vars_t *v, int pass)</arglist>
     </member>
     <member kind="function">
@@ -5145,8 +5145,8 @@
   </compound>
   <compound kind="file">
     <name>xml.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprint/</path>
-    <filename>xml_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprint/</path>
+    <filename>xml_8h.html</filename>
     <includes id="mxml_8h" name="mxml.h" local="no" imported="no">gutenprint/mxml.h</includes>
     <member kind="typedef">
       <type>int(*</type>
@@ -5229,21 +5229,21 @@
       <type>stp_raw_t *</type>
       <name>stp_xmlstrtoraw</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a4a44cfc8ec6e821c4f8564397b3bd66f</anchor>
+      <anchor>a0d158d5a94f2440dadbc45a02e8fe130</anchor>
       <arglist>(const char *textval)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_rawtoxmlstr</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a3e003171cb008a542fffbeff3f2e2299</anchor>
+      <anchor>aba3037953d04a66165f0c4087e2db52d</anchor>
       <arglist>(const stp_raw_t *raw)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_strtoxmlstr</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a6bdda178f51ef17e02b0c662e0b06a8b</anchor>
+      <anchor>af49519fdec3dfc3b3b3365210c9de9eb</anchor>
       <arglist>(const char *raw)</arglist>
     </member>
     <member kind="function">
@@ -5271,14 +5271,14 @@
       <type>stp_mxml_node_t *</type>
       <name>stp_xml_get_node</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a3f776c6582845b20c4f76b239d590ec6</anchor>
+      <anchor>a5d498b6b257d66d855e1f8d30e684105</anchor>
       <arglist>(stp_mxml_node_t *xmlroot,...)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xmldoc_create_generic</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a31f7bc9f5f2b2ce79dcfc87d7f4630f2</anchor>
+      <anchor>ae8dd722b98d916dc1130200eb7133909</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -5292,56 +5292,56 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create_from_xmltree</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>afa6f69121eb86b2aee998635b79d21ac</anchor>
+      <anchor>a3b6f65774b43fe064d229c29062615d0</anchor>
       <arglist>(stp_mxml_node_t *da)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xmltree_create_from_sequence</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>ad03ea12e2b0089daf469c6af120ef180</anchor>
+      <anchor>ac5396f947dd179c6ca1ac9fe32741365</anchor>
       <arglist>(const stp_sequence_t *seq)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_xmltree</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a112e57d9f022170ee00b0a66fea1770f</anchor>
+      <anchor>a75803664756fb9b0905f884e4c4d0d43</anchor>
       <arglist>(stp_mxml_node_t *da)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xmltree_create_from_curve</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>ae8c5f8944f4921f772eb12e52c7fb95d</anchor>
+      <anchor>acb057c0e93ab37501fba6691f26fbb82</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_xmltree</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>ace5ac81af291e43504d5c0200276e543</anchor>
+      <anchor>a53bafc18452d7bbe818fb4d1ca5e2b7d</anchor>
       <arglist>(stp_mxml_node_t *array)</arglist>
     </member>
     <member kind="function">
       <type>stp_vars_t *</type>
       <name>stp_vars_create_from_xmltree</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a2ec4cf1f87b354d564429f3d34afd029</anchor>
+      <anchor>a7cca6538acee333afec3c0cd374c819d</anchor>
       <arglist>(stp_mxml_node_t *da)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xmltree_create_from_array</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>ae02d45dc8cae7bea5c4e378e121d6623</anchor>
+      <anchor>a1abc548146b6c544ee10a0acbd65fa1e</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
       <type>stp_vars_t *</type>
       <name>stp_vars_create_from_xmltree_ref</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>acecaf19b0eb498487f14bf462c181c16</anchor>
+      <anchor>a8920717d7454d586155339404ab5ead6</anchor>
       <arglist>(stp_mxml_node_t *da, stp_mxml_node_t *root)</arglist>
     </member>
     <member kind="function">
@@ -5362,7 +5362,7 @@
       <type>stp_mxml_node_t *</type>
       <name>stp_xmltree_create_from_vars</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a139bc6e17f2ccabf7e149241f923d9c4</anchor>
+      <anchor>ada2b53198c88c6a063932f06e6f09ccc</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -5376,28 +5376,28 @@
       <type>stp_mxml_node_t *</type>
       <name>stp_xml_parse_file_from_path</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a28d1b4f184cece4caaf366afe541e154</anchor>
+      <anchor>ae1f5a01f5e607e4b7b38f61a31579a84</anchor>
       <arglist>(const char *name, const char *topnodename, const char *path)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xml_parse_file_from_path_uncached</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>af904bc30d092d1f18551d534bd409959</anchor>
+      <anchor>a3b894e80ed4deb55e6158329b6c4297d</anchor>
       <arglist>(const char *name, const char *topnodename, const char *path)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xml_parse_file_from_path_safe</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>ac61ac4836ad44afefeb548ee14e47dde</anchor>
+      <anchor>a2e48233000ada56c85d1a9588469e733</anchor>
       <arglist>(const char *name, const char *topnodename, const char *path)</arglist>
     </member>
     <member kind="function">
       <type>stp_mxml_node_t *</type>
       <name>stp_xml_parse_file_from_path_uncached_safe</name>
       <anchorfile>xml_8h.html</anchorfile>
-      <anchor>a5d4b1789075299e5cf7e33173458391f</anchor>
+      <anchor>a21ee0169b9fee40b322c4d7c0af97b8e</anchor>
       <arglist>(const char *name, const char *topnodename, const char *path)</arglist>
     </member>
     <member kind="function">
@@ -5844,7 +5844,7 @@
       <type>const char *(*</type>
       <name>get_appname</name>
       <anchorfile>structstp__image.html</anchorfile>
-      <anchor>ace1dbc5b42be0242c60635d278b835bb</anchor>
+      <anchor>a63b8f809edb12b466c67e9a2fdc7c3aa</anchor>
       <arglist>)(struct stp_image *image)</arglist>
     </member>
     <member kind="variable">
@@ -6440,7 +6440,7 @@
       <type>union stp_parameter_t::@0</type>
       <name>bounds</name>
       <anchorfile>structstp__parameter__t.html</anchorfile>
-      <anchor>abb297424036e868212f5086d5c5235fe</anchor>
+      <anchor>a8e156bf12ce940b41a6b177d2de1a03d</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -6482,7 +6482,7 @@
       <type>union stp_parameter_t::@1</type>
       <name>deflt</name>
       <anchorfile>structstp__parameter__t.html</anchorfile>
-      <anchor>a79042d88fa0ab284a8e3e4ad7b969f90</anchor>
+      <anchor>a6e25344ab977e01b06b5a733ff7fea0e</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -6643,7 +6643,7 @@
       <type>stp_array_t *</type>
       <name>stp_array_create</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaa3d385d3e2f248b1c1ac88d5f103e9a2</anchor>
+      <anchor>ga33314ccd4033c4a8ee0907b7cf913f3a</anchor>
       <arglist>(int x_size, int y_size)</arglist>
     </member>
     <member kind="function">
@@ -6664,7 +6664,7 @@
       <type>stp_array_t *</type>
       <name>stp_array_create_copy</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gad0b50228ca40df79196197f9c21f4b56</anchor>
+      <anchor>gaf34342c0070224a74c36ec39a71322ff</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
@@ -6713,7 +6713,7 @@
       <type>const stp_sequence_t *</type>
       <name>stp_array_get_sequence</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gae05ba5cfe8c03e2435348d6c5488d87e</anchor>
+      <anchor>gaae059b3629e413fe480ea7c663e53b09</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
@@ -6727,28 +6727,28 @@
       <type>char *</type>
       <name>stp_array_write_string</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>ga1e2262c54ced078e6e5e38113aeeddf5</anchor>
+      <anchor>gae707a88ef4003cfc2f2406bfc1504286</anchor>
       <arglist>(const stp_array_t *array)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_stream</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>ga497c7ee10ce8d0f90a7289d4f81688ce</anchor>
+      <anchor>ga1a0372963b8d36405303f4da6675c056</anchor>
       <arglist>(FILE *fp)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_file</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaf481883d42f37cba19a2d7463b29ac7b</anchor>
+      <anchor>gab7afd1a2001776f30d82e35243eebc61</anchor>
       <arglist>(const char *file)</arglist>
     </member>
     <member kind="function">
       <type>stp_array_t *</type>
       <name>stp_array_create_from_string</name>
       <anchorfile>group__array.html</anchorfile>
-      <anchor>gaeb16e8b11cb35960bbacb5131bf15f43</anchor>
+      <anchor>ga12e226086beb3c33590ee0b5c2efc279</anchor>
       <arglist>(const char *string)</arglist>
     </member>
   </compound>
@@ -6762,7 +6762,7 @@
       <type>struct stp_color</type>
       <name>stp_color_t</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>gad1408f9835b72f266ec7c7e1e1202a74</anchor>
+      <anchor>ga4ae91ac7188774f43487dd0ae545099a</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -6818,35 +6818,35 @@
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga3b8f62108f3604480e7b89b253527f4a</anchor>
+      <anchor>gac07538c92894938f97138c2967ec05ee</anchor>
       <arglist>(const char *name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_index</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga68ba525119da39ae854645ae649557d3</anchor>
+      <anchor>ga1427eaf67c191b219c8a9cc2ecd2dd86</anchor>
       <arglist>(int idx)</arglist>
     </member>
     <member kind="function">
       <type>const stp_color_t *</type>
       <name>stp_get_color_by_colorfuncs</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga578f80b2bc3937df38ce7e803f5f472c</anchor>
+      <anchor>gaa9ec9842aef9c741faddd86da6b9ce06</anchor>
       <arglist>(stp_colorfuncs_t *colorfuncs)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_color_get_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga5a4a4da67cb5c3f1c0a2a9618e46ed50</anchor>
+      <anchor>ga643152ae67df4e50c8db59ee28eb7674</anchor>
       <arglist>(const stp_color_t *c)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_color_get_long_name</name>
       <anchorfile>group__color.html</anchorfile>
-      <anchor>ga612389b45f09358f6bad0e376c91b057</anchor>
+      <anchor>ga62418b53c63f9ff33cf2cfb03628badd</anchor>
       <arglist>(const stp_color_t *c)</arglist>
     </member>
   </compound>
@@ -6954,14 +6954,14 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_create</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga6b3640f0e25bd9d38e46bdc1b2ee58a4</anchor>
+      <anchor>ga87c2abb4c105236caeda6ff92923778c</anchor>
       <arglist>(stp_curve_wrap_mode_t wrap)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_copy</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga972ed591394396e0c66e928a0695b3bf</anchor>
+      <anchor>gade693de34b184befb4b66a65fafb48c1</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -6975,7 +6975,7 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_create_reverse</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga8c2aed234d3e4ddc4c239801be17bb73</anchor>
+      <anchor>ga315482813f48b16be512f225ce69ded6</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -7115,7 +7115,7 @@
       <type>stp_curve_t *</type>
       <name>stp_curve_get_subrange</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga5cbf7c4b6ad96ecb35fc06f46c0319f0</anchor>
+      <anchor>gab477b6f7be5794b78d8aa1479176ef1b</anchor>
       <arglist>(const stp_curve_t *curve, size_t start, size_t count)</arglist>
     </member>
     <member kind="function">
@@ -7129,70 +7129,70 @@
       <type>const double *</type>
       <name>stp_curve_get_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gab2208f56694e47e4300d10e057f59ee8</anchor>
+      <anchor>ga57bacd29cb4eeef9000ca6f444cf19c1</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const stp_curve_point_t *</type>
       <name>stp_curve_get_data_points</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga79e0d6afa3573917c756af64b56a0d82</anchor>
+      <anchor>gab9f17b739570c1a82503b9d6d9eddc3d</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const float *</type>
       <name>stp_curve_get_float_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga251f105cb5f2b126ea02b7908f717c18</anchor>
+      <anchor>gaf8acb14ba132e0c62e6ee7207615ba11</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const long *</type>
       <name>stp_curve_get_long_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaf59bd38c9dfc7beb08a283dc9e400bf2</anchor>
+      <anchor>gad1d9c2c86ae7f8c9de4cb095dd9e819b</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned long *</type>
       <name>stp_curve_get_ulong_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga24a862eda4cdbb626f51aeb7d8ae9a50</anchor>
+      <anchor>gacbe68f737cc5388e27c2198166fdc12e</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const int *</type>
       <name>stp_curve_get_int_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga6de80e81b64262e0051441f697ae4de4</anchor>
+      <anchor>gab1da93b31073d22e25cc67da477a7b96</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned int *</type>
       <name>stp_curve_get_uint_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga19b3160a57dc6959fe08c631c7206a8a</anchor>
+      <anchor>gafc85f2230248e30b38b96464589b1017</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const short *</type>
       <name>stp_curve_get_short_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga87c5d1904efa58be8a21ab6b2c41d0b9</anchor>
+      <anchor>gad38136704a9f0761ed4b1295983ac6ba</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned short *</type>
       <name>stp_curve_get_ushort_data</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaa02125af6b9c192e34985851370391b8</anchor>
+      <anchor>gabd1eba1f9531b9c590a7bef3aa55cba4</anchor>
       <arglist>(const stp_curve_t *curve, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const stp_sequence_t *</type>
       <name>stp_curve_get_sequence</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gade323594e84d4380c88ecf122a5a4da8</anchor>
+      <anchor>ga2647fee9eb719635f8d0599984f3531b</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
@@ -7255,28 +7255,28 @@
       <type>char *</type>
       <name>stp_curve_write_string</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gaf2f0da590278ff74af1eccb0aa0c7169</anchor>
+      <anchor>ga43d2a48601fe341a90fd4ede77bc3bee</anchor>
       <arglist>(const stp_curve_t *curve)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_stream</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>ga478a24e44a3ce345f7207cf7ded12e37</anchor>
+      <anchor>gad04e42c2e4fa598d5d4aad7f2e47a33f</anchor>
       <arglist>(FILE *fp)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_file</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gad96d7d1cda5f037f7d6a9b651ebbbb46</anchor>
+      <anchor>ga2710ab80726552eecba9c4f8d53268bb</anchor>
       <arglist>(const char *file)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_curve_create_from_string</name>
       <anchorfile>group__curve.html</anchorfile>
-      <anchor>gab8c0df217306a6e0597f058efbfaca82</anchor>
+      <anchor>ga31699ef1132b2b175202a13c614c30bc</anchor>
       <arglist>(const char *string)</arglist>
     </member>
     <member kind="function">
@@ -7452,7 +7452,7 @@
       <type>const char *</type>
       <name>stp_check_version</name>
       <anchorfile>group__version.html</anchorfile>
-      <anchor>ga05a93cb4ac52cc50875b5839c59bcafc</anchor>
+      <anchor>ga530c20a9e4d5b008c7934b1c113dc922</anchor>
       <arglist>(unsigned int required_major, unsigned int required_minor, unsigned int required_micro)</arglist>
     </member>
     <member kind="variable">
@@ -7514,7 +7514,7 @@
       <type>struct stp_image</type>
       <name>stp_image_t</name>
       <anchorfile>group__image.html</anchorfile>
-      <anchor>gaae0b5ef92b619849a51cb75d376a90fb</anchor>
+      <anchor>gac9735a3743a64e43a6fd0fb300a11ae1</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumeration">
@@ -7575,7 +7575,7 @@
       <type>const char *</type>
       <name>stp_image_get_appname</name>
       <anchorfile>group__image.html</anchorfile>
-      <anchor>ga1643f6b9eb180e98f3c1c267950f18d2</anchor>
+      <anchor>ga935fb7504afeb551cf28945cb59415c2</anchor>
       <arglist>(stp_image_t *image)</arglist>
     </member>
     <member kind="function">
@@ -7615,14 +7615,14 @@
       <type>void *(*</type>
       <name>stp_node_copyfunc</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gacc52db9cbfb5090120e0ee8a24c396f2</anchor>
+      <anchor>ga5c44f9a1b6a21f13a339298a3f38817a</anchor>
       <arglist>)(const void *)</arglist>
     </member>
     <member kind="typedef">
       <type>const char *(*</type>
       <name>stp_node_namefunc</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga278b6a7d80911974bba5fb3db5bd0146</anchor>
+      <anchor>gad094dc048e2febb12c6e3c3ab0219da6</anchor>
       <arglist>)(const void *)</arglist>
     </member>
     <member kind="typedef">
@@ -7643,14 +7643,14 @@
       <type>stp_list_t *</type>
       <name>stp_list_create</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga3cfea94cd07f50d7d9b4ce384d349fca</anchor>
+      <anchor>ga41f4fa9884eefc8294c418a48eb8bbaf</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_t *</type>
       <name>stp_list_copy</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga0ba249dd06efbf5c0af8511ceab671e8</anchor>
+      <anchor>gacd7fa1c8ed8247f7252764a7418bad76</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
@@ -7664,35 +7664,35 @@
       <type>stp_list_item_t *</type>
       <name>stp_list_get_start</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad185100e8d7969a473e9d42bc8084572</anchor>
+      <anchor>ga5be4023b77ec6b83ef123dbf0199203c</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_end</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gae939f15ee1a6e4c0aaad7a7be7f40b74</anchor>
+      <anchor>gae0c30c0f6dced76cf2aba02096c399e7</anchor>
       <arglist>(const stp_list_t *list)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_index</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad377973e8b13d02c9c111d970f491993</anchor>
+      <anchor>gafed62244b97b534e00ec6392649ed1f9</anchor>
       <arglist>(const stp_list_t *list, int idx)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_name</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga729867c847dd8282f74806968c708f28</anchor>
+      <anchor>ga1a22c464c35b072fc4fb80e3f549dbef</anchor>
       <arglist>(const stp_list_t *list, const char *name)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_get_item_by_long_name</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gacc9140df3f4311cd750ba10a1cbf37d1</anchor>
+      <anchor>ga40fb6fc8eb3bd9dea9fa2ee302411d7e</anchor>
       <arglist>(const stp_list_t *list, const char *long_name)</arglist>
     </member>
     <member kind="function">
@@ -7790,21 +7790,21 @@
       <type>stp_list_item_t *</type>
       <name>stp_list_item_prev</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gabaa2a241055402438a0cae6f40cf6a78</anchor>
+      <anchor>gac5524e26c661b427b04a02ed62c7f517</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
       <type>stp_list_item_t *</type>
       <name>stp_list_item_next</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>ga81ab310caf6432ce1e492eaafdb6c0d7</anchor>
+      <anchor>gacc16f5650e7f91737c97042b5889e600</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_list_item_get_data</name>
       <anchorfile>group__list.html</anchorfile>
-      <anchor>gad6f6b303b40fa75f22a86391785178cb</anchor>
+      <anchor>ga2f41b7e55f350d6cdfccff0c0588e827</anchor>
       <arglist>(const stp_list_item_t *item)</arglist>
     </member>
     <member kind="function">
@@ -7874,7 +7874,7 @@
       <type>const stp_papersize_t *</type>
       <name>stp_describe_papersize</name>
       <anchorfile>group__papersize.html</anchorfile>
-      <anchor>gaa1030bc16945705116695eedf09ecd17</anchor>
+      <anchor>gab3a86ea20d95e53a7b0d9f427fdc7f98</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -7907,35 +7907,35 @@
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_index</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga440501ca226e0a9ac1335c7e52ee55a6</anchor>
+      <anchor>ga401919f87c978373d723591570f69ccc</anchor>
       <arglist>(int idx)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_long_name</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga6bd5abd876100c17fc9029659fed92f4</anchor>
+      <anchor>ga1001b83f79230791af6119d7290f535d</anchor>
       <arglist>(const char *long_name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_driver</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gae45de9ef94fb609c2a54f1d80144552e</anchor>
+      <anchor>ga5e8bc0e8e092c49a66d9c4325895ad7c</anchor>
       <arglist>(const char *driver)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer_by_device_id</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gadce65b83e3dd0ffcb75591ed3ba81155</anchor>
+      <anchor>gaf7e9e4dff576b922067c9151b486fdc6</anchor>
       <arglist>(const char *device_id)</arglist>
     </member>
     <member kind="function">
       <type>const stp_printer_t *</type>
       <name>stp_get_printer</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gac649c4b3d0a93f26f99deb4b081305c1</anchor>
+      <anchor>ga1c5a3fea2c449a136435f83fb3d5f2f4</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -7949,42 +7949,42 @@
       <type>const char *</type>
       <name>stp_printer_get_long_name</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga11804fb9b8d87ed1f2a3acbd39f5f85a</anchor>
+      <anchor>ga088c9cbd04b26080b23656a07e930f64</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_driver</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gac345b8cf8cd78da98fdb4c6b2d9cf7ca</anchor>
+      <anchor>gac938a15e0d777d38120a6bf6ba6bd46f</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_device_id</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga7bbd6440baa533d99616eccb5f449354</anchor>
+      <anchor>ga4f8d490cddff197d687d6d0468c8e8fd</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_family</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga487b74bf101a842f30b5941b8db4769a</anchor>
+      <anchor>ga7f01dafbd0b27700a707bdc885e8056e</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_manufacturer</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gab99dd05c42aed848d1567f2b346fb4f4</anchor>
+      <anchor>ga515ab73e0868bcf4adaed0e1e6f6af78</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_printer_get_comment</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga04564fc764774143b2e5924c40c6e271</anchor>
+      <anchor>ga3ec8a415db669e79a2fd5ef4b0a32761</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
@@ -7998,7 +7998,7 @@
       <type>const stp_vars_t *</type>
       <name>stp_printer_get_defaults</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga4f6859e0f21ed2062075d6b9f680a202</anchor>
+      <anchor>gafca950361d996aee7b19a7cb88534d5a</anchor>
       <arglist>(const stp_printer_t *p)</arglist>
     </member>
     <member kind="function">
@@ -8040,7 +8040,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_get_external_options</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>gaae7a50e6175eed1b84d2e20c924b33ca</anchor>
+      <anchor>gae3c87779c0ac5a7258acc7ff94215aa4</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -8082,7 +8082,7 @@
       <type>const char *</type>
       <name>stp_describe_output</name>
       <anchorfile>group__printer.html</anchorfile>
-      <anchor>ga50b48bab8d6d1734c3a0f6622d65582e</anchor>
+      <anchor>ga299d0f36a68094049a8bc7765587dfb5</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
   </compound>
@@ -8101,7 +8101,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga9f0233f39d6a27c796bb283c80974618</anchor>
+      <anchor>ga98a9784a7085b9728c1c09c48e083015</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -8122,7 +8122,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create_copy</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gab03a34a03ffd4163f51126916d737df7</anchor>
+      <anchor>ga50e959627676fa5b7708d85196c2f767</anchor>
       <arglist>(const stp_sequence_t *sequence)</arglist>
     </member>
     <member kind="function">
@@ -8136,7 +8136,7 @@
       <type>stp_sequence_t *</type>
       <name>stp_sequence_create_reverse</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gade64193f944aaba0365a96691d479974</anchor>
+      <anchor>ga5c9bee3e48e29bac17913ffc6f2db0db</anchor>
       <arglist>(const stp_sequence_t *sequence)</arglist>
     </member>
     <member kind="function">
@@ -8262,49 +8262,49 @@
       <type>const float *</type>
       <name>stp_sequence_get_float_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gaff096d5b027157151c65978b95d4e29e</anchor>
+      <anchor>ga0c94c327508ed24aa22c1939843045e2</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const long *</type>
       <name>stp_sequence_get_long_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga039d9054cfd0f7d5a892a7fec3f734f4</anchor>
+      <anchor>gadfb5b30fea7feed638271c25b574b867</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned long *</type>
       <name>stp_sequence_get_ulong_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga12f54f27144d490893f46dd1b0037b8b</anchor>
+      <anchor>ga01afc68d2ea4098b30ff14510ba520e6</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const int *</type>
       <name>stp_sequence_get_int_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga01b0bc9e181a097aff3e97254dbfcb14</anchor>
+      <anchor>ga128f73b493f1dee85bd7b1b5903a9e5d</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned int *</type>
       <name>stp_sequence_get_uint_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>gae7189582ef9e4d638f909a2b1ee0c1b2</anchor>
+      <anchor>ga144a6580eac5665e7d71e6c636df3c16</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const short *</type>
       <name>stp_sequence_get_short_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga4d1cf137e4a77e9123e2afcdf7d63bec</anchor>
+      <anchor>ga03efc35c1c39b65f356537899e7dae5b</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
     <member kind="function">
       <type>const unsigned short *</type>
       <name>stp_sequence_get_ushort_data</name>
       <anchorfile>group__sequence.html</anchorfile>
-      <anchor>ga20007077e1d8365a0eddaa922a5967c3</anchor>
+      <anchor>gadd29ab141145e2fd96720a388eb9c02f</anchor>
       <arglist>(const stp_sequence_t *sequence, size_t *count)</arglist>
     </member>
   </compound>
@@ -8561,7 +8561,7 @@
       <type>void *</type>
       <name>stp_get_global_errdata</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga022fb7959595871a61323b7778a9c107</anchor>
+      <anchor>ga097127091a373fd53348ea5d17209fbf</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -8575,21 +8575,21 @@
       <type>void *</type>
       <name>stp_get_global_dbgdata</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga0b34dbe6fa1029df485b165064b64f85</anchor>
+      <anchor>gab28ce1062ce5c33212d9e7ab1b9f155d</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_set_output_codeset</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga7fcc19f0abdc6513dfba7eaebeb16cb9</anchor>
+      <anchor>ga8b8a70433d6b9e593307207be4840ade</anchor>
       <arglist>(const char *codeset)</arglist>
     </member>
     <member kind="function">
       <type>stp_curve_t *</type>
       <name>stp_read_and_compose_curves</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gadbe8c167230b49bc10391d2c246e6dc0</anchor>
+      <anchor>ga500ca8423acdb05cd9bc45cd138f8270</anchor>
       <arglist>(const char *s1, const char *s2, stp_curve_compose_t comp, size_t piecewise_point_count)</arglist>
     </member>
     <member kind="function">
@@ -8757,21 +8757,21 @@
       <type>void *</type>
       <name>stp_malloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga86a2976738a237df953655e733c75b3a</anchor>
+      <anchor>gac4e3512be498a3c2d4d7e11ed21d88f7</anchor>
       <arglist>(size_t)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_zalloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gac8fd1a439fa2d8e1ff1a2b104cd0137b</anchor>
+      <anchor>gab43d4ede1b627dc80dc183bac6b5861c</anchor>
       <arglist>(size_t)</arglist>
     </member>
     <member kind="function">
       <type>void *</type>
       <name>stp_realloc</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga2420936ab8b3492581f389deea44f58c</anchor>
+      <anchor>ga154195c622faaa1f01d0985c098603f5</anchor>
       <arglist>(void *ptr, size_t)</arglist>
     </member>
     <member kind="function">
@@ -8792,28 +8792,28 @@
       <type>char *</type>
       <name>stp_strndup</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>gab026f7022963acd694a8b89e4decbde5</anchor>
+      <anchor>ga158e263d2728afe40f0969452086f1e8</anchor>
       <arglist>(const char *s, int n)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_strdup</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga5c0731867697f555a94b2a1229804381</anchor>
+      <anchor>ga39df354af82bfec584eed91e389cec28</anchor>
       <arglist>(const char *s)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_version</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga1f0797636484393574cb95e667819dc1</anchor>
+      <anchor>ga9b6449064ac66e7ed472c4f7e5b9181f</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_release_version</name>
       <anchorfile>group__util.html</anchorfile>
-      <anchor>ga5ba7edc43ed094f32ae7d9158a362a7b</anchor>
+      <anchor>gab6d86a9eae88734a960b8a8d89945f20</anchor>
       <arglist>(void)</arglist>
     </member>
   </compound>
@@ -8879,7 +8879,7 @@
       <type>void *(*</type>
       <name>stp_copy_data_func_t</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga785dacfaf459d30c8874f2afc1c90d6d</anchor>
+      <anchor>gafb001f0919ec46ebe2bd98e705bfeef1</anchor>
       <arglist>)(void *)</arglist>
     </member>
     <member kind="typedef">
@@ -9116,7 +9116,7 @@
       <type>stp_vars_t *</type>
       <name>stp_vars_create</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga5d641ab7093c9ba82cbd4cfbf904fabc</anchor>
+      <anchor>ga63e789a54ec99a51f72a1ba3c9754dfe</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -9130,7 +9130,7 @@
       <type>stp_vars_t *</type>
       <name>stp_vars_create_copy</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaec00fba49ad08d20890e64773bcdbd48</anchor>
+      <anchor>gaff9d607359cd0ab004efa1e2b3d498df</anchor>
       <arglist>(const stp_vars_t *source)</arglist>
     </member>
     <member kind="function">
@@ -9158,7 +9158,7 @@
       <type>const char *</type>
       <name>stp_get_driver</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga20c45707399ef6fdf6ee8c8209b5c7c0</anchor>
+      <anchor>gadf1a58982840e8c33e978bf758f64f1b</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -9179,7 +9179,7 @@
       <type>const char *</type>
       <name>stp_get_color_conversion</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga2bac9212773ecf603b7667bd0268c23e</anchor>
+      <anchor>ga67f4c78acad208648a1b38f8242655d5</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -9319,7 +9319,7 @@
       <type>void *</type>
       <name>stp_get_outdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga7042b05e0df5b32206d54397429bbac5</anchor>
+      <anchor>ga9b07863fc17bbf3e950a96e4af01fd7b</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -9333,7 +9333,7 @@
       <type>void *</type>
       <name>stp_get_errdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gad08bdcd721d37f52993c1862e25ebaf7</anchor>
+      <anchor>gaa0800913521842915df1a1d47f540971</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -9347,7 +9347,7 @@
       <type>void *</type>
       <name>stp_get_dbgdata</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaa3c75772969cff226a7da34b7ec0d52e</anchor>
+      <anchor>gacd8cf7dde0fd8a8efd7b62a34de520ea</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
@@ -9382,14 +9382,14 @@
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_find</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadcd8062af7b643c734f53c545694d258</anchor>
+      <anchor>gab5d497add463b9547a674b8d26648710</anchor>
       <arglist>(stp_const_parameter_list_t list, const char *name)</arglist>
     </member>
     <member kind="function">
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_list_param</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga70d69ef7dec383004bf4570e57b76e18</anchor>
+      <anchor>gafa6a98d9899b4a95e33f4b02314f27bf</anchor>
       <arglist>(stp_const_parameter_list_t list, size_t item)</arglist>
     </member>
     <member kind="function">
@@ -9445,7 +9445,7 @@
       <type>const stp_parameter_t *</type>
       <name>stp_parameter_find_in_settings</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga6ce39557b61706421232b5f1ac604b1b</anchor>
+      <anchor>gac4b236c8e689fb037166d357b80ad828</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">
@@ -9613,14 +9613,14 @@
       <type>const char *</type>
       <name>stp_get_string_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gab5b21e5606b8ca755c5eac7774260efa</anchor>
+      <anchor>gaae7195d4847e4ec2e096854225553118</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const char *</type>
       <name>stp_get_file_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga2021992d89c92b10138fb012a9554a08</anchor>
+      <anchor>gab2f50ba86b2473748474c63ef581b241</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
@@ -9655,21 +9655,21 @@
       <type>const stp_curve_t *</type>
       <name>stp_get_curve_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga553dec81dd8b3e5590d963ba72223557</anchor>
+      <anchor>gaa96eb0b7c43f8952201e51e1e4ef4c66</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const stp_array_t *</type>
       <name>stp_get_array_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gac50c216c2d5cd56a9704f48d4338b179</anchor>
+      <anchor>gacf2ba7671be48805bc9ff438584b531a</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
       <type>const stp_raw_t *</type>
       <name>stp_get_raw_parameter</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga9fff6c14a71f5f8ec28620ef64a92fd5</anchor>
+      <anchor>gaf12c210ea01ade9ac2aee21ae4c76ca5</anchor>
       <arglist>(const stp_vars_t *v, const char *parameter)</arglist>
     </member>
     <member kind="function">
@@ -9746,70 +9746,70 @@
       <type>stp_string_list_t *</type>
       <name>stp_list_string_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga110e543418842a6dd79149409620bf13</anchor>
+      <anchor>ga841b43e950778a668e4aa015f220d557</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_file_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga76c7e033078e6c2fa276ee72ca97c63c</anchor>
+      <anchor>ga7ffb2adcf5f44b64ae8ab4b9690ec976</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_float_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadec4183ce240188ed18fdc21d9b518f7</anchor>
+      <anchor>ga2aa3ea416f7d5f0f83bcb6f49bcd871e</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_int_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gae08d29a439b77219f32d037ab5b191f5</anchor>
+      <anchor>ga5bb539833e81dfa1fb8475ff24f4506e</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_dimension_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga5cae4a118badc7c52e5f7b7543c83d8e</anchor>
+      <anchor>gafc8dfc0c9e107d46b0608c69301d0031</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_boolean_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga60f98e23144fd1bf5aa53def670b2c91</anchor>
+      <anchor>ga388bc8e8facabe39876001c73a02ed09</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_curve_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga1329d614d6cd18fc6c244b020e26b081</anchor>
+      <anchor>ga9f3ffa8bfc47d5303f09c9082c26db7f</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_array_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga16d23d59368e907a29719f0902ea75fe</anchor>
+      <anchor>gae0d8fc1ce35c5e73ba3cc2e022138e83</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_raw_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga4d06ccaf72d08800f7eb78b3293f4a00</anchor>
+      <anchor>ga91c4710df5ce5c0d03d895a0389bafdf</anchor>
       <arglist>(const stp_vars_t *v)</arglist>
     </member>
     <member kind="function">
       <type>stp_string_list_t *</type>
       <name>stp_list_parameters</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga27864133bc2159d1472cbdfb3b781c27</anchor>
+      <anchor>ga576ee9d7ebe66ee4b2537268d7a5e808</anchor>
       <arglist>(const stp_vars_t *v, stp_parameter_type_t type)</arglist>
     </member>
     <member kind="function">
@@ -10068,14 +10068,14 @@
       <type>const stp_vars_t *</type>
       <name>stp_default_settings</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gaf63982a6e44f8b62532346d9ceb3d91c</anchor>
+      <anchor>ga447e540a84c3926482c5bbc3c92522a9</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stp_parameter_get_category</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gadb64d444ebed8ec698ce949f8a1aae4b</anchor>
+      <anchor>ga0e392f6e79690db8f7ec5ba13d80d196</anchor>
       <arglist>(const stp_vars_t *v, const stp_parameter_t *desc, const char *category)</arglist>
     </member>
     <member kind="function">
@@ -10089,7 +10089,7 @@
       <type>stp_string_list_t *</type>
       <name>stp_parameter_get_categories</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>gad87a41146ef226c77cb8dc4993e40863</anchor>
+      <anchor>ga6b2c713321b9303fc6d442a1c12214f1</anchor>
       <arglist>(const stp_vars_t *v, const stp_parameter_t *desc)</arglist>
     </member>
     <member kind="function">
@@ -10110,7 +10110,7 @@
       <type>void *</type>
       <name>stp_get_component_data</name>
       <anchorfile>group__vars.html</anchorfile>
-      <anchor>ga1666dd1571bdb866a85d4318858893be</anchor>
+      <anchor>gaa2dc20cc1a030b4f646b8bc02c685d03</anchor>
       <arglist>(const stp_vars_t *v, const char *name)</arglist>
     </member>
     <member kind="function">

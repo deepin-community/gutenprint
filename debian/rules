@@ -40,8 +40,19 @@ override_dh_installdocs:
 	dh_installdocs -pescputil --link-doc=libgutenprint9
 	dh_installdocs -plibgutenprintui2-dev --link-doc=libgutenprintui2-2
 	dh_installdocs --remaining-packages
+	# Remove build directory from gutenprint.tag file to make
+	# build reproducible.
+	find
+	-sed -i -e 's,$(CURDIR),BUILDPATH,g' \
+		debian/libgutenprint-doc/usr/share/doc/libgutenprint-doc/reference/gutenprint.tag
 
 override_dh_install-arch:
+	# Remove build path, timestamp, username, and uname output to
+	# make build reproducible.
+	sed -i -e 's,$(CURDIR),BUILDPATH,g' \
+		-e 's,Generated at.*,Generated at REDACTED,g' \
+		-e 's,uname -a output:.*,uname -a output: REDACTED,g' \
+		$(shell find debian/tmp/ -name config.summary)
 ifeq ($(DEB_BUILD_ARCH_OS),linux)
 	dh_install -pprinter-driver-gutenprint usr/share/cups/usb
 endif

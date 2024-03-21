@@ -1,13 +1,13 @@
 /*
  *   Shinko/Sinfonia CHC-S1245 CUPS backend -- libusb-1.0 version
  *
- *   (c) 2015-2019 Solomon Peachy <pizza@shaftnet.org>
+ *   (c) 2015-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   Low-level documentation was provided by Sinfonia, Inc.  Thank you!
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -20,23 +20,11 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
 
 #define BACKEND shinkos1245_backend
 
@@ -190,16 +178,6 @@ struct shinkos1245_cmd_tone {
 	};
 } __attribute__((packed));
 
-enum {
-	TONE_TABLE_STANDARD = 0,
-	TONE_TABLE_USER = 1,
-	TONE_TABLE_CURRENT = 2,
-};
-enum {
-	PARAM_TABLE_STANDARD = 1,
-	PARAM_TABLE_FINE = 2,
-};
-
 #define TONE_CURVE_DATA_BLOCK_SIZE 64
 
 /* Query Model information */
@@ -244,16 +222,16 @@ struct shinkos1245_resp_matte {
 
 /* Private data structure */
 struct shinkos1245_ctx {
-	struct libusb_device_handle *dev;
-	uint8_t endp_up;
-	uint8_t endp_down;
-	int type;
+	struct dyesub_connection *conn;
 
 	uint8_t jobid;
 
 	struct sinfonia_mediainfo_item medias[MAX_MEDIA_ITEMS];
 	int num_medias;
 	int media_8x12;
+
+	char serial[32];
+	char fwver[32];
 
 	struct marker marker;
 
@@ -286,12 +264,12 @@ static int shinkos1245_do_cmd(struct shinkos1245_ctx *ctx,
 	int ret;
 
 	/* Write command */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     cmd, cmd_len)))
 		return (ret < 0) ? ret : -99;
 
 	/* Read response */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			resp, resp_len, actual_len);
 	if (ret < 0)
 		return ret;
@@ -328,7 +306,7 @@ static int shinkos1245_get_status(struct shinkos1245_ctx *ctx,
 	/* Byteswap important stuff */
         resp->state.status2 = be32_to_cpu(resp->state.status2);
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int shinkos1245_get_media(struct shinkos1245_ctx *ctx)
@@ -393,7 +371,7 @@ static int shinkos1245_get_printerid(struct shinkos1245_ctx *ctx,
 		return ret;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int shinkos1245_set_printerid(struct shinkos1245_ctx *ctx,
@@ -425,7 +403,7 @@ static int shinkos1245_set_printerid(struct shinkos1245_ctx *ctx,
 		ERROR("Bad return code on SET_PRINTERID command\n");
 		return -99;
 	}
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int shinkos1245_canceljob(struct shinkos1245_ctx *ctx,
@@ -450,7 +428,7 @@ static int shinkos1245_canceljob(struct shinkos1245_ctx *ctx,
 		ERROR("Bad return code on CANCELJOB command\n");
 		return -99;
 	}
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int shinkos1245_reset(struct shinkos1245_ctx *ctx)
@@ -473,7 +451,7 @@ static int shinkos1245_reset(struct shinkos1245_ctx *ctx)
 		ERROR("Bad return code on RESET command\n");
 		return -99;
 	}
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 
@@ -497,7 +475,7 @@ static int shinkos1245_set_matte(struct shinkos1245_ctx *ctx,
 		return ret;
 	}
 	if (sts.code == CMD_CODE_OK)
-		return 0;
+		return CUPS_BACKEND_OK;
 	if (sts.code == CMD_CODE_BAD)
 		return 1;
 
@@ -529,10 +507,10 @@ static int shinkos1245_get_matte(struct shinkos1245_ctx *ctx,
 	}
 	*intensity = sts.level;
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
-static char* shinkos1245_tonecurves(int type, int table)
+static const char* shinkos1245_tonecurves(int type, int table)
 {
 	switch (type) {
 	case TONE_TABLE_STANDARD:
@@ -570,7 +548,7 @@ static char* shinkos1245_tonecurves(int type, int table)
 static void shinkos1245_dump_status(struct shinkos1245_ctx *ctx,
 				    struct shinkos1245_resp_status *sts)
 {
-	char *detail;
+	const char *detail;
 	switch (sts->print_status) {
 	case STATUS_PRINTING:
 		detail = "Printing";
@@ -711,7 +689,7 @@ static int get_tonecurve(struct shinkos1245_ctx *ctx, int type, int table, char 
 		}
 
 		/* And read back 64-bytes of data */
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				ptr, TONE_CURVE_DATA_BLOCK_SIZE, &num);
 		if (num != TONE_CURVE_DATA_BLOCK_SIZE) {
 			ret = -99;
@@ -829,7 +807,7 @@ static int set_tonecurve(struct shinkos1245_ctx *ctx, int type, int table, char 
 		}
 
 		/* Write 64-bytes of data */
-		ret = send_data(ctx->dev, ctx->endp_up,
+		ret = send_data(ctx->conn,
 				ptr, TONE_CURVE_DATA_BLOCK_SIZE);
 		if (ret < 0)
 			goto done;
@@ -877,7 +855,7 @@ static void shinkos1245_cmdline(void)
 	DEBUG("\t\t[ -L filename ]  # Set current tone curve\n");
 }
 
-int shinkos1245_cmdline_arg(void *vctx, int argc, char **argv)
+static int shinkos1245_cmdline_arg(void *vctx, int argc, char **argv)
 {
 	struct shinkos1245_ctx *ctx = vctx;
 	int i, j = 0;
@@ -942,7 +920,7 @@ int shinkos1245_cmdline_arg(void *vctx, int argc, char **argv)
 		if (j) return j;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static void *shinkos1245_init(void)
@@ -959,15 +937,11 @@ static void *shinkos1245_init(void)
 	return ctx;
 }
 
-static int shinkos1245_attach(void *vctx, struct libusb_device_handle *dev, int type,
-			      uint8_t endp_up, uint8_t endp_down, uint8_t jobid)
+static int shinkos1245_attach(void *vctx, struct dyesub_connection *conn, uint8_t jobid)
 {
 	struct shinkos1245_ctx *ctx = vctx;
 
-	ctx->dev = dev;
-	ctx->endp_up = endp_up;
-	ctx->endp_down = endp_down;
-	ctx->type = type;
+	ctx->conn = conn;
 
 	/* Ensure jobid is sane */
 	ctx->jobid = jobid & 0x7f;
@@ -992,8 +966,9 @@ static int shinkos1245_attach(void *vctx, struct libusb_device_handle *dev, int 
 	}
 	ctx->marker.color = "#00FFFF#FF00FF#FFFF00";
 	ctx->marker.name = ctx->media_8x12 ? "8x12" : "8x10";
+	ctx->marker.numtype = ctx->media_8x12;
 	ctx->marker.levelmax = ctx->media_8x12 ? 230 : 280;
-	ctx->marker.levelnow = -2;
+	ctx->marker.levelnow = CUPS_MARKER_UNKNOWN;
 
 	return CUPS_BACKEND_OK;
 }
@@ -1013,6 +988,7 @@ static int shinkos1245_read_parse(void *vctx, const void **vjob, int data_fd, in
 		return CUPS_BACKEND_RETRY_CURRENT;
 	}
 	memset(job, 0, sizeof(*job));
+	job->common.jobsize = sizeof(*job);
 
 	/* Common read/parse code */
 	ret = sinfonia_read_parse(data_fd, 1245, job);
@@ -1021,16 +997,15 @@ static int shinkos1245_read_parse(void *vctx, const void **vjob, int data_fd, in
 		return ret;
 	}
 
-	if (job->jp.copies > 1)
-		job->copies = job->jp.copies;
-	else
-		job->copies = copies;
+	/* Use larger of our copy counts */
+	if (job->common.copies < copies)
+		job->common.copies = copies;
 
 	*vjob = job;
 	return CUPS_BACKEND_OK;
 }
 
-static int shinkos1245_main_loop(void *vctx, const void *vjob) {
+static int shinkos1245_main_loop(void *vctx, const void *vjob, int wait_for_return) {
 	struct shinkos1245_ctx *ctx = vctx;
 	int i, num, last_state = -1, state = S_IDLE;
 	struct shinkos1245_resp_status status1, status2;
@@ -1043,7 +1018,7 @@ static int shinkos1245_main_loop(void *vctx, const void *vjob) {
 	if (!job)
 		return CUPS_BACKEND_FAILED;
 
-	copies = job->copies;
+	copies = job->common.copies;
 
 	/* Make sure print size is supported */
 	for (i = 0 ; i < ctx->num_medias ; i++) {
@@ -1087,7 +1062,7 @@ top:
 
 	last_state = state;
 
-	fflush(stderr);
+	fflush(logger);
 
 	switch (state) {
 	case S_IDLE:
@@ -1182,7 +1157,7 @@ top:
 
 		/* Send over data */
 		INFO("Sending image data to printer\n");
-		if ((i = send_data(ctx->dev, ctx->endp_down,
+		if ((i = send_data(ctx->conn,
 				   job->databuf, job->datalen)))
 			return CUPS_BACKEND_FAILED;
 
@@ -1192,7 +1167,7 @@ top:
 		break;
 	}
 	case S_PRINTER_SENT_DATA:
-		if (fast_return) {
+		if (!wait_for_return) {
 			INFO("Fast return mode enabled.\n");
 			state = S_FINISHED;
 		}
@@ -1220,15 +1195,13 @@ printer_error2:
 	return CUPS_BACKEND_FAILED;
 }
 
-static int shinkos1245_query_serno(struct libusb_device_handle *dev, uint8_t endp_up, uint8_t endp_down, char *buf, int buf_len)
+static int shinkos1245_query_serno(struct dyesub_connection *conn, char *buf, int buf_len)
 {
 	struct shinkos1245_resp_getid resp;
 	int i;
 
 	struct shinkos1245_ctx ctx = {
-		.dev = dev,
-		.endp_up = endp_up,
-		.endp_down = endp_down,
+		.conn = conn,
 	};
 
 	i = shinkos1245_get_printerid(&ctx, &resp);
@@ -1259,28 +1232,56 @@ static int shinkos1245_query_markers(void *vctx, struct marker **markers, int *c
 
 	ctx->marker.levelnow = ctx->marker.levelmax - be32_to_cpu(status.counters.media);
 
-	*markers = &ctx->marker;
-	*count = 1;
+	if (markers) *markers = &ctx->marker;
+	if (markers) *count = 1;
 
 	return CUPS_BACKEND_OK;
 }
 
-/* Exported */
-#define USB_VID_SHINKO       0x10CE
-#define USB_PID_SHINKO_S1245 0x0007
+static int shinkos1245_query_stats(void *vctx,  struct printerstats *stats)
+{
+	struct shinkos1245_ctx *ctx = vctx;
+	struct shinkos1245_resp_status status;
+
+	if (shinkos1245_query_markers(ctx, NULL, NULL))
+		return CUPS_BACKEND_FAILED;
+
+	if (shinkos1245_get_status(ctx, &status))
+		return CUPS_BACKEND_FAILED;
+
+	stats->mfg = "Sinfonia";
+	stats->model = "E1 / S1245";
+
+	if (shinkos1245_query_serno(ctx->conn,
+				    ctx->serial, sizeof(ctx->serial)))
+		return CUPS_BACKEND_FAILED;
+
+	stats->serial = ctx->serial;
+
+	snprintf(ctx->fwver, sizeof(ctx->fwver)-1,
+		 "%d / %d", be16_to_cpu(status.versions.main_control),
+		 be16_to_cpu(status.versions.dsp_control));
+	stats->fwver = ctx->fwver;
+
+	stats->decks = 1;
+	stats->mediatype[0] = ctx->marker.name;
+	stats->levelmax[0] = ctx->marker.levelmax;
+	stats->levelnow[0] = ctx->marker.levelnow;
+	stats->name[0] = "Roll";
+	stats->status[0] = strdup(sinfonia_1x45_status_str(status.state.status1, status.state.status2, status.state.error));
+	stats->cnt_life[0] = be32_to_cpu(status.counters.lifetime);
+
+	return CUPS_BACKEND_OK;
+}
 
 static const char *shinkos1245_prefixes[] = {
-	"shinko-chcs1245",
-	// extra
-	"sinfonia-chcs1245",
-	// backwards-compatibility
-	"shinkos1245",
+	"shinkos1245", /* Family Name */
 	NULL
 };
 
-struct dyesub_backend shinkos1245_backend = {
+const struct dyesub_backend shinkos1245_backend = {
 	.name = "Shinko/Sinfonia CHC-S1245/E1",
-	.version = "0.31" " (lib " LIBSINFONIA_VER ")",
+	.version = "0.35" " (lib " LIBSINFONIA_VER ")",
 	.uri_prefixes = shinkos1245_prefixes,
 	.cmdline_usage = shinkos1245_cmdline,
 	.cmdline_arg = shinkos1245_cmdline_arg,
@@ -1291,8 +1292,10 @@ struct dyesub_backend shinkos1245_backend = {
 	.main_loop = shinkos1245_main_loop,
 	.query_serno = shinkos1245_query_serno,
 	.query_markers = shinkos1245_query_markers,
+	.query_stats = shinkos1245_query_stats,
 	.devices = {
-		{ USB_VID_SHINKO, USB_PID_SHINKO_S1245, P_SHINKO_S1245, NULL, "shinko-chcs1245"},
+		{ 0x10ce, 0x0007, P_SHINKO_S1245, NULL, "shinko-chcs1245"},
+		{ 0x10ce, 0x0007, P_SHINKO_S1245, NULL, "sinfonia-chcs1245"}, /* Duplicate */
 		{ 0, 0, 0, NULL, NULL}
 	}
 };

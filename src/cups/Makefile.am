@@ -82,7 +82,7 @@ if BUILD_CUPS
 bin_PROGRAMS = cups-calibrate
 sbin_PROGRAMS = cups-genppd.@GUTENPRINT_RELEASE_VERSION@
 sbin_SCRIPTS = cups-genppdupdate
-cupsexec_filter_PROGRAMS = rastertogutenprint.@GUTENPRINT_RELEASE_VERSION@ commandtoepson commandtocanon
+cupsexec_filter_PROGRAMS = rastertogutenprint.@GUTENPRINT_RELEASE_VERSION@ commandtoepson commandtocanon commandtodyesub
 
 if BUILD_LIBUSB_BACKENDS
 cupsexec_backend_PROGRAMS = backend_gutenprint
@@ -123,10 +123,10 @@ commandtoepson_SOURCES = commandtoepson.c
 commandtoepson_LDADD = $(CUPS_LIBS)
 
 if BUILD_LIBUSB_BACKENDS
-backend_gutenprint_SOURCES = backend_canonselphy.c backend_canonselphyneo.c backend_kodak1400.c backend_kodak6800.c backend_kodak605.c backend_shinkos2145.c backend_sonyupd.c backend_dnpds40.c backend_mitsu70x.c backend_mitsu9550.c backend_sinfonia.c backend_sinfonia.h backend_common.c backend_common.h backend_shinkos1245.c backend_shinkos6145.c backend_shinkos6245.c backend_mitsup95d.c backend_magicard.c backend_mitsud90.c
+backend_gutenprint_SOURCES = backend_canonselphy.c backend_canonselphyneo.c backend_kodak1400.c backend_kodak6800.c backend_kodak605.c backend_shinkos2145.c backend_sonyupd.c backend_sonyupdneo.c backend_dnpds40.c backend_mitsu70x.c backend_mitsu9550.c backend_sinfonia.c backend_sinfonia.h backend_common.c backend_common.h backend_shinkos1245.c backend_shinkos6145.c backend_shinkos6245.c backend_mitsup95d.c backend_magicard.c backend_mitsud90.c backend_hiti.c backend_mitsu.c backend_mitsu.h backend_kodak8800.c
 
 backend_gutenprint_LDADD = $(LIBUSB_LIBS) $(LIBUSB_BACKEND_LIBDEPS)
-backend_gutenprint_CPPFLAGS = $(LIBUSB_CFLAGS) -DURI_PREFIX=\"gutenprint$(GUTENPRINT_MAJOR_VERSION)$(GUTENPRINT_MINOR_VERSION)+usb\" -DLIBUSB_PRE_1_0_10
+backend_gutenprint_CPPFLAGS = $(AM_CPPFLAGS) $(LIBUSB_CFLAGS) -DLIBUSB_PRE_1_0_10
 endif
 
 cups_genppd_@GUTENPRINT_RELEASE_VERSION@_SOURCES = cups-genppd.c genppd.c genppd.h i18n.c i18n.h
