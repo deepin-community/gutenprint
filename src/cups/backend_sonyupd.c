@@ -1,11 +1,11 @@
 /*
  *   Sony UP-D series Photo Printer CUPS backend -- libusb-1.0 version
  *
- *   (c) 2013-2019 Solomon Peachy <pizza@shaftnet.org>
+ *   (c) 2013-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -18,23 +18,11 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
  */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
 
 #define BACKEND sonyupd_backend
 
@@ -49,15 +37,21 @@ struct sony_updsts {
 	uint8_t  zero1;    /* 0x00 */
 	uint8_t  printing; /* UPD_PRINTING_* */
 	uint8_t  remain;   /* Number of remaining pages */
-	uint8_t  zero2;
+	uint8_t  sts0;     /* UPD_STS0_* */
 	uint8_t  sts1;     /* UPD_STS1_* */
-	uint8_t  sts2;     /* seconday status */
-	uint8_t  sts3;     /* tertiary status */
-	uint16_t unk;      /* seen 0x04a0 UP-CR10L, 0x04a8 on UP-DR150 */
+	uint8_t  sts2;     /* UPD_STS2_* */
+	uint8_t  sts3;     /* UPD_STS3_* */
+	uint8_t  ribbon;   /* 0x04 = R206/6x8 or C48/4x8 */
+	uint8_t  paper;    /* 0x38 = EMPTY, 0xa8/0x90 = loaded */
 	uint16_t max_cols; /* BE */
 	uint16_t max_rows; /* BE */
 	uint8_t  percent;  /* 0-99, if job is printing (UP-D89x) */
 } __attribute__((packed));
+
+struct sony_prints {
+	uint8_t zero[4];
+	uint16_t remain;  /* BE, remaining prints on media */
+} __attribute((packed));
 
 #define UPD_PRINTING_BW    0xe0  /* UPD-895/897 only */
 #define UPD_PRINTING_Y     0x40
@@ -66,82 +60,75 @@ struct sony_updsts {
 #define UPD_PRINTING_O     0x20
 #define UPD_PRINTING_IDLE  0x00
 
+/* Confirmed on UP-DR200 */
+#define UPD_STS0_OK        0x00
+#define UPD_STS0_NORIBBON  0x10
+#define UPD_STS0_NOPAPER   0x20
+#define UPD_STS0_DOOROPEN  0x40
+
 #define UPD_STS1_IDLE      0x00
 #define UPD_STS1_DOOROPEN  0x08
 #define UPD_STS1_NOPAPER   0x40
 #define UPD_STS1_PRINTING  0x80
+#define UPD_STS1_PRINTING2 0xC0
+
+#define UPD_RIBBON_R206    0x04
+#define UPD_RIBBON_C48     0x04
 
 /* Private data structures */
 struct upd_printjob {
+	struct dyesub_job_common common;
+
 	uint8_t *databuf;
 	int datalen;
 
-	int copies;
 	uint16_t rows;
 	uint16_t cols;
 	uint32_t imglen;
 };
 
 struct upd_ctx {
-	struct libusb_device_handle *dev;
-	uint8_t endp_up;
-	uint8_t endp_down;
-	int type;
+	struct dyesub_connection *conn;
 
 	int native_bpp;
 
-	struct sony_updsts stsbuf;
+	struct sony_updsts    stsbuf;
+	struct sony_prints    printbuf;
 
 	struct marker marker;
 };
 
-/* Now for the code */
-static void* upd_init(void)
+static const char *upd_ribbons(int type, uint8_t code)
 {
-	struct upd_ctx *ctx = malloc(sizeof(struct upd_ctx));
-	if (!ctx) {
-		ERROR("Memory Allocation Failure!");
-		return NULL;
-	}
-	memset(ctx, 0, sizeof(struct upd_ctx));
-	return ctx;
-}
-
-static int upd_attach(void *vctx, struct libusb_device_handle *dev, int type,
-			  uint8_t endp_up, uint8_t endp_down, uint8_t jobid)
-{
-	struct upd_ctx *ctx = vctx;
-
-	UNUSED(jobid);
-
-	ctx->dev = dev;
-	ctx->endp_up = endp_up;
-	ctx->endp_down = endp_down;
-	ctx->type = type;
-
-	if (ctx->type == P_SONY_UPD895 || ctx->type == P_SONY_UPD897) {
-		ctx->marker.color = "#000000";  /* Ie black! */
-		ctx->native_bpp = 1;
-	} else {
-		ctx->marker.color = "#00FFFF#FF00FF#FFFF00";
-		ctx->native_bpp = 3;
+	if (type == P_SONY_UPD895 || type == P_SONY_UPD897) {
+		return "UP-110 Roll";
+	} else if (type == P_SONY_UPCR10) {
+		if (code == UPD_RIBBON_C48)
+			return "2UPC-C48 (4x8)";
+	} else if (type == P_SONY_UPDR150) {
+		/* DR200/DR150 */
+		if (code == UPD_RIBBON_R206)
+			return "R206 (8x6)";
 	}
 
-	ctx->marker.name = "Unknown";
-	ctx->marker.levelmax = -1;
-	ctx->marker.levelnow = -2;
-
-	return CUPS_BACKEND_OK;
+	return "Unknown";
 }
 
-static void upd_cleanup_job(const void *vjob)
+static int sonyupd_media_maxes(uint8_t type, uint8_t media)
 {
-	const struct upd_printjob *job = vjob;
+	if (type == P_SONY_UPDR150) {
+		if (media == UPD_RIBBON_R206)
+			return 350;
+		else
+			return 700; // XXX guess until we have more codes?
 
-	if (job->databuf)
-		free(job->databuf);
-
-	free((void*)job);
+		// XXX also differs for DR200 vs DR150?
+	} else if (type == P_SONY_UPCR10) {
+		if (media == UPD_RIBBON_C48)
+			return 150;
+		return 200; // XXX guess until we have more codes.
+	}
+	return CUPS_MARKER_UNAVAILABLE;
 }
 
 // UP-DR200
@@ -156,12 +143,19 @@ static void upd_cleanup_job(const void *vjob)
 // 2UPC-R155         (335)
 // 2UPC-R156         (295)
 
+// UP-CR10L & UP-CX1
+
+// 2UPC-C13          (344)
+// 2UPC-C14          (200)
+// 2UPC-C15          (172)
+// 2UPC-C48          (150)
+
 // print order:  ->YMCO->
 // current prints (power on)
 // total prints (lifetime)
 // f/w version
 
-static char* upd895_statuses(uint8_t code)
+static const char* upd895_statuses(uint8_t code)
 {
 	switch (code) {
 	case UPD_STS1_IDLE:
@@ -171,40 +165,145 @@ static char* upd895_statuses(uint8_t code)
 	case UPD_STS1_NOPAPER:
 		return "No paper";
 	case UPD_STS1_PRINTING:
+	case UPD_STS1_PRINTING2:
 		return "Printing";
 	default:
 		return "Unknown";
 	}
 }
 
+static const char* updr200_statuses(uint8_t code)
+{
+	switch (code) {
+	case UPD_STS0_OK:
+		return "OK";
+	case UPD_STS0_DOOROPEN:
+		return "Door open";
+	case UPD_STS0_NOPAPER:
+		return "No paper";
+	case UPD_STS0_NORIBBON:
+		return "No ribbon";
+	default:
+		return "Unknown";
+	}
+}
+
+/* Now for the code */
+
 static int sony_get_status(struct upd_ctx *ctx, struct sony_updsts *buf)
 {
 	int ret, num = 0;
 	uint8_t query[7] = { 0x1b, 0xe0, 0, 0, 0, 0x0f, 0 };
 
-	if (ctx->type == P_SONY_UPD895)
+	if (ctx->conn->type == P_SONY_UPD895)
 		query[5] = 0x0e;
 
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     query, sizeof(query))))
 		return CUPS_BACKEND_FAILED;
 
-	ret = read_data(ctx->dev, ctx->endp_up, (uint8_t*) buf, sizeof(*buf),
+	ret = read_data(ctx->conn, (uint8_t*) buf, sizeof(*buf),
 			&num);
 
 	if (ret < 0)
 		return CUPS_BACKEND_FAILED;
 #if 0
-	if (ctx->type == P_SONY_UPD895 && ret != 14)
+	if (ctx->conn->type == P_SONY_UPD895 && ret != 14)
 		return CUPS_BACKEND_FAILED;
 	else if (ret != 15)
 		return CUPS_BACKEND_FAILED;
 #endif
 
-	ctx->stsbuf.max_cols = be16_to_cpu(ctx->stsbuf.max_cols);
-	ctx->stsbuf.max_rows = be16_to_cpu(ctx->stsbuf.max_rows);
+	buf->max_cols = be16_to_cpu(buf->max_cols);
+	buf->max_rows = be16_to_cpu(buf->max_rows);
 
 	return CUPS_BACKEND_OK;
+}
+
+static int sony_get_prints(struct upd_ctx *ctx, struct sony_prints *buf)
+{
+	int ret, num = 0;
+	uint8_t query[7] = { 0x1b, 0xef, 0, 0, 0, 0x06, 0 };
+
+	if ((ret = send_data(ctx->conn,
+			     query, sizeof(query))))
+		return CUPS_BACKEND_FAILED;
+
+	ret = read_data(ctx->conn, (uint8_t*) buf, sizeof(*buf),
+			&num);
+
+	if (ret < 0)
+		return CUPS_BACKEND_FAILED;
+
+	buf->remain = be16_to_cpu(buf->remain);
+
+	return CUPS_BACKEND_OK;
+}
+
+static void* upd_init(void)
+{
+	struct upd_ctx *ctx = malloc(sizeof(struct upd_ctx));
+	if (!ctx) {
+		ERROR("Memory Allocation Failure!\n");
+		return NULL;
+	}
+	memset(ctx, 0, sizeof(struct upd_ctx));
+	return ctx;
+}
+
+static int upd_attach(void *vctx, struct dyesub_connection *conn, uint8_t jobid)
+{
+	struct upd_ctx *ctx = vctx;
+
+	UNUSED(jobid);
+
+	ctx->conn = conn;
+
+	if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+		ctx->marker.color = "#000000";  /* Ie black! */
+		ctx->native_bpp = 1;
+	} else {
+		ctx->marker.color = "#00FFFF#FF00FF#FFFF00";
+		ctx->native_bpp = 3;
+	}
+
+	if (test_mode < TEST_MODE_NOATTACH) {
+		int ret;
+		if ((ret = sony_get_status(ctx, &ctx->stsbuf))) {
+			return ret;
+		}
+		if ((ctx->conn->type != P_SONY_UPD895 && ctx->conn->type != P_SONY_UPD897) && (ret = sony_get_prints(ctx, &ctx->printbuf))) {
+			return ret;
+		}
+	}
+
+	if (test_mode >= TEST_MODE_NOATTACH && getenv("MEDIA_CODE")) {
+		ctx->marker.numtype = atoi(getenv("MEDIA_CODE"));
+	} else {
+		ctx->marker.numtype = ctx->stsbuf.ribbon;
+	}
+
+	ctx->marker.name = upd_ribbons(ctx->conn->type, ctx->stsbuf.ribbon);
+	if (test_mode >= TEST_MODE_NOATTACH || ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+		ctx->marker.levelmax = CUPS_MARKER_UNAVAILABLE;
+		ctx->marker.levelnow = CUPS_MARKER_UNKNOWN;
+	} else {
+		ctx->marker.levelmax = sonyupd_media_maxes(ctx->conn->type, ctx->stsbuf.ribbon);
+		ctx->marker.levelnow = ctx->printbuf.remain;
+	}
+
+
+	return CUPS_BACKEND_OK;
+}
+
+static void upd_cleanup_job(const void *vjob)
+{
+	const struct upd_printjob *job = vjob;
+
+	if (job->databuf)
+		free(job->databuf);
+
+	free((void*)job);
 }
 
 #define MAX_PRINTJOB_LEN (2048*2764*3 + 2048)
@@ -227,7 +326,8 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 		return CUPS_BACKEND_RETRY_CURRENT;
 	}
 	memset(job, 0, sizeof(*job));
-	job->copies = copies;
+	job->common.jobsize = sizeof(*job);
+	job->common.copies = copies;
 
 	job->datalen = 0;
 	job->databuf = malloc(MAX_PRINTJOB_LEN);
@@ -258,14 +358,14 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 				if(dyesub_debug)
 					DEBUG("Block ID '%08x' (len %d)\n", len, 0);
 				len = 0;
-				if (ctx->type == P_SONY_UPDR150)
+				if (ctx->conn->type == P_SONY_UPDR150)
 					run = 0;
 				break;
 			case 0xfffffff7:
 				if(dyesub_debug)
 					DEBUG("Block ID '%08x' (len %d)\n", len, 0);
 				len = 0;
-				if (ctx->type == P_SONY_UPCR10)
+				if (ctx->conn->type == P_SONY_UPCR10)
 					run = 0;
 				break;
 			case 0xfffffff8: // 895
@@ -273,7 +373,7 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 				if(dyesub_debug)
 					DEBUG("Block ID '%08x' (len %d)\n", len, 0);
 				len = 0;
-				if (ctx->type == P_SONY_UPD895 || ctx->type == P_SONY_UPD897)
+				if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897)
 					run = 0;
 				break;
 			case 0xffffff97:
@@ -282,7 +382,7 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 				len = 12;
 				break;
 			case 0xffffffef:
-				if (ctx->type == P_SONY_UPD895 || ctx->type == P_SONY_UPD897) {
+				if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
 					if(dyesub_debug)
 						DEBUG("Block ID '%08x' (len %d)\n", len, 0);
 					len = 0;
@@ -297,7 +397,7 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 				len = 4;
 				break;
 			case 0xffffffec:
-				if (ctx->type == P_SONY_UPD897) {
+				if (ctx->conn->type == P_SONY_UPD897) {
 					if(dyesub_debug)
 						DEBUG("Block ID '%08x' (len %d)\n", len, 4);
 					len = 4;
@@ -348,6 +448,8 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 				case 0x15: /* Print dimensions */
 					param_offset = job->datalen + 16 + offset;
 					break;
+				// XXX case 0xc0:
+				// for param 03, take the value at offset 4 -- for (eg) 4x6 on 8x6 media, needs to be set to 0x02
 				case 0xee:
 					copies_offset = job->datalen + 7 + offset;
 					break;
@@ -374,10 +476,14 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 
 	/* Some models specify copies in the print job */
 	if (copies_offset) {
-		uint16_t tmp = copies;
-		tmp = cpu_to_be16(copies);
-		memcpy(job->databuf + copies_offset, &tmp, sizeof(tmp));
-		job->copies = 1;
+		uint16_t tmp;
+		memcpy(&tmp, job->databuf + copies_offset, sizeof(tmp));
+		tmp = be16_to_cpu(tmp);
+		if (tmp < copies) {  /* Use whichever one is larger */
+			tmp = cpu_to_be16(copies);
+			memcpy(job->databuf + copies_offset, &tmp, sizeof(tmp));
+		}
+		job->common.copies = 1;
 	}
 
 	/* Parse some other stuff */
@@ -406,7 +512,7 @@ static int upd_read_parse(void *vctx, const void **vjob, int data_fd, int copies
 	return CUPS_BACKEND_OK;
 }
 
-static int upd_main_loop(void *vctx, const void *vjob) {
+static int upd_main_loop(void *vctx, const void *vjob, int wait_for_return) {
 	struct upd_ctx *ctx = vctx;
 	int i, ret;
 	int copies;
@@ -418,13 +524,13 @@ static int upd_main_loop(void *vctx, const void *vjob) {
 	if (!job)
 		return CUPS_BACKEND_FAILED;
 
-	copies = job->copies;
+	copies = job->common.copies;
 
 top:
 	/* Send Unknown CMD.  Resets? */
-	if (ctx->type == P_SONY_UPD897) {
+	if (ctx->conn->type == P_SONY_UPD897) {
 		const uint8_t cmdbuf[7] = { 0x1b, 0x1f, 0, 0, 0, 0, 0 };
-		ret = send_data(ctx->dev, ctx->endp_down,
+		ret = send_data(ctx->conn,
 				cmdbuf, sizeof(cmdbuf));
 		if (ret)
 			return CUPS_BACKEND_FAILED;
@@ -447,25 +553,27 @@ top:
 	}
 
 	/* Check for idle */
-	if (ctx->stsbuf.sts1 != 0x00) {
-		if (ctx->stsbuf.sts1 == 0x80) {
+	if (ctx->stsbuf.sts1 != UPD_STS1_IDLE) {
+		if (ctx->stsbuf.sts1 == UPD_STS1_PRINTING) {
 			INFO("Waiting for printer idle...\n");
 			sleep(1);
 			goto top;
+		} else {
+			// XXX some sort of error?
 		}
 	}
 
 	/* Send RESET */
-	if (ctx->type != P_SONY_UPD895) {
+	if (ctx->conn->type != P_SONY_UPD895) {
 		const uint8_t rstbuf[7] = { 0x1b, 0x16, 0, 0, 0, 0, 0 };
-		ret = send_data(ctx->dev, ctx->endp_down,
+		ret = send_data(ctx->conn,
 				rstbuf, sizeof(rstbuf));
 		if (ret)
 			return CUPS_BACKEND_FAILED;
 	}
 
 #if 0 /* Unknown query */
-	if (ctx->type == P_SONY_UPD897) {
+	if (ctx->conn->type == P_SONY_UPD897) {
 		// -> 1b e6 00 00 00 08 00
 		// <- ???
 	}
@@ -480,7 +588,7 @@ top:
 
 		i += sizeof(uint32_t);
 
-		if ((ret = send_data(ctx->dev, ctx->endp_down,
+		if ((ret = send_data(ctx->conn,
 				     job->databuf + i, len)))
 			return CUPS_BACKEND_FAILED;
 
@@ -503,14 +611,18 @@ retry:
 	case UPD_STS1_IDLE:
 		goto done;
 	case UPD_STS1_PRINTING:
+	case UPD_STS1_PRINTING2:
 		break;
 	default:
-		ERROR("Printer error: %s (%02x)\n", upd895_statuses(ctx->stsbuf.sts1),
-		      ctx->stsbuf.sts1);
+		if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+			ERROR("Printer error: %s (%02x)\n", upd895_statuses(ctx->stsbuf.sts1), ctx->stsbuf.sts1);
+		} else {
+			ERROR("Printer error: %s (%02x)\n", updr200_statuses(ctx->stsbuf.sts0), ctx->stsbuf.sts0);
+		}
 		return CUPS_BACKEND_STOP;
 	}
 
-	if (fast_return && ctx->stsbuf.printing != UPD_PRINTING_IDLE) {
+	if (!wait_for_return && ctx->stsbuf.printing != UPD_PRINTING_IDLE) {
 		INFO("Fast return mode enabled.\n");
 	} else {
 		goto retry;
@@ -536,11 +648,25 @@ static int upd895_dump_status(struct upd_ctx *ctx)
 	if (ret < 0)
 		return CUPS_BACKEND_FAILED;
 
-	INFO("Printer status: %s (%02x)\n", upd895_statuses(ctx->stsbuf.sts1), ctx->stsbuf.sts1);
+	if (ctx->conn->type != P_SONY_UPD895 && ctx->conn->type != P_SONY_UPD897 && (ret = sony_get_prints(ctx, &ctx->printbuf))) {
+		return CUPS_BACKEND_FAILED;
+	}
+
+	if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+		INFO("Printer status: %s (%02x)\n", upd895_statuses(ctx->stsbuf.sts1), ctx->stsbuf.sts1);
+	} else {
+		INFO("Printer status: %s (%02x)\n", updr200_statuses(ctx->stsbuf.sts0), ctx->stsbuf.sts0);
+	}
+
 	if (ctx->stsbuf.printing != UPD_PRINTING_IDLE &&
 	    ctx->stsbuf.sts1 == UPD_STS1_PRINTING)
-		INFO("Remaining copies: %d\n", ctx->stsbuf.remain);
+		INFO("Remaining copies to print: %d\n", ctx->stsbuf.remain);
 
+	INFO("Media: %s (%02x)\n", upd_ribbons(ctx->conn->type, ctx->stsbuf.ribbon), ctx->stsbuf.ribbon);
+
+	if (ctx->conn->type != P_SONY_UPD895 && ctx->conn->type != P_SONY_UPD897) {
+		INFO("Media remaining: %d/%d\n", ctx->printbuf.remain, sonyupd_media_maxes(ctx->conn->type, ctx->stsbuf.ribbon));
+	}
 	return CUPS_BACKEND_OK;
 }
 
@@ -569,7 +695,7 @@ static int upd_cmdline_arg(void *vctx, int argc, char **argv)
 		if (j) return j;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int upd_query_markers(void *vctx, struct marker **markers, int *count)
@@ -583,39 +709,39 @@ static int upd_query_markers(void *vctx, struct marker **markers, int *count)
 	if (ret)
 		return CUPS_BACKEND_FAILED;
 
-	if (ctx->stsbuf.sts1 == 0x40 ||
-	    ctx->stsbuf.sts1 == 0x08) {
-		ctx->marker.levelnow = 0;
-		STATE("+media-empty\n");
+	if (ctx->conn->type != P_SONY_UPD895 && ctx->conn->type != P_SONY_UPD897 && (ret = sony_get_prints(ctx, &ctx->printbuf))) {
+		return CUPS_BACKEND_FAILED;
+	}
+
+	if (ctx->stsbuf.sts1 == UPD_STS1_NOPAPER ||
+	    ctx->stsbuf.sts1 == UPD_STS1_DOOROPEN) {
+		if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+			ctx->marker.levelnow = 0;
+		} else {
+			ctx->marker.levelnow = ctx->printbuf.remain;
+		}
 	} else {
-		ctx->marker.levelnow = -3;
-		STATE("-media-empty\n");
+		if (ctx->conn->type == P_SONY_UPD895 || ctx->conn->type == P_SONY_UPD897) {
+			ctx->marker.levelnow = CUPS_MARKER_UNKNOWN_OK;
+		} else {
+			ctx->marker.levelnow = ctx->printbuf.remain;
+		}
 	}
 
 	return CUPS_BACKEND_OK;
 }
 
 static const char *sonyupd_prefixes[] = {
-	"sonyupd",
-	"sony-updr150", "sony-updr200", "sony-upcr10l",
-	"sony-upd895", "sony-upd897", "dnp-sl10",
+	"sonyupd", /* Family Name */
+	"dnp-sl10", // Unknown if shared with CR10L
 	// Backwards compatibility
-	"sonyupdr150",
-	"sonyupdr200", "sonyupcr10",
+	"sonyupdr150", "sonyupdr200", "sonyupcr10",
 	NULL
 };
 
-/* Exported */
-#define USB_VID_SONY         0x054C
-#define USB_PID_SONY_UPDR150 0x01E8
-#define USB_PID_SONY_UPDR200 0x035F
-#define USB_PID_SONY_UPCR10  0x0226
-#define USB_PID_SONY_UPD895  0x0049
-#define USB_PID_SONY_UPD897  0x01E7
-
-struct dyesub_backend sonyupd_backend = {
+const struct dyesub_backend sonyupd_backend = {
 	.name = "Sony UP-D",
-	.version = "0.37",
+	.version = "0.46",
 	.uri_prefixes = sonyupd_prefixes,
 	.cmdline_arg = upd_cmdline_arg,
 	.cmdline_usage = upd_cmdline,
@@ -626,11 +752,12 @@ struct dyesub_backend sonyupd_backend = {
 	.main_loop = upd_main_loop,
 	.query_markers = upd_query_markers,
 	.devices = {
-		{ USB_VID_SONY, USB_PID_SONY_UPDR150, P_SONY_UPDR150, NULL, "sony-updr150"},
-		{ USB_VID_SONY, USB_PID_SONY_UPDR200, P_SONY_UPDR150, NULL, "sony-updr200"},
-		{ USB_VID_SONY, USB_PID_SONY_UPCR10, P_SONY_UPCR10, NULL, "sony-upcr10l"},
-		{ USB_VID_SONY, USB_PID_SONY_UPD895, P_SONY_UPD895, NULL, "sonyupd895"},
-		{ USB_VID_SONY, USB_PID_SONY_UPD897, P_SONY_UPD897, NULL, "sony-upd897"},
+		{ 0x054c, 0x01e8, P_SONY_UPDR150, NULL, "sony-updr150"},
+		{ 0x054c, 0x035f, P_SONY_UPDR150, NULL, "sony-updr200"},
+		{ 0x054c, 0x0226, P_SONY_UPCR10, NULL, "sony-upcr10l"},
+		{ 0x054c, 0x02d4, P_SONY_UPCR10, NULL, "sony-upcx1"},
+		{ 0x054c, 0x0049, P_SONY_UPD895, NULL, "sony-upd895"},
+		{ 0x054c, 0x01e7, P_SONY_UPD897, NULL, "sony-upd897"},
 		{ 0, 0, 0, NULL, NULL}
 	}
 };
@@ -668,7 +795,7 @@ struct dyesub_backend sonyupd_backend = {
 
    UNKNOWN QUERY  [possibly media?]
 
- <- 1b 03 00 00 00 13 00
+ <- 1b 03 00 00 00  13 00
  -> 70 00 00 00 00 00 00 0b  00 00 00 00 00 00 00 00
     00 00 00
 
@@ -678,11 +805,11 @@ struct dyesub_backend sonyupd_backend = {
 
    PRINT DIMENSIONS
 
- <- 1b 15 00 00 00 0d 00
+ <- 1b 15 00 00 00  0d 00
  <- 00 00 00 00 ZZ QQ QQ WW  WW YY YY XX XX
 
     QQ/WW/YY/XX are (origin_cols/origin_rows/cols/rows) in BE.
-    ZZ is 0x07 on UP-DR series, 0x01 on UP-D89x series.
+    ZZ is 0x07 on UP-DR series, 0x01 on UP-D89x series. plane mask maybe?
 
    RESET
 
@@ -698,13 +825,13 @@ struct dyesub_backend sonyupd_backend = {
 
    SET PARAM
 
- <- 1b c0 00 NN LL 00 00    # LL is response length, NN is number.
- <- [ NN bytes]
+ <- 1b c0 00 NN 00 LL 00    # LL is response length, NN is number.
+ <- [ LL bytes]
 
    QUERY PARAM
 
- <- 1b c1 00 NN LL 00 00    # LL is response length, NN is number.
- -> [ NN bytes ]
+ <- 1b c1 00 NN 00 LL 00    # LL is response length, NN is number.
+ -> [ LL bytes ]
 
       PARAMS SEEN:
     03, len 5    [ 02 03 00 01 XX ]                   (UPDR200, 00 = normal, 02 is multicut/div2 print, 01 seen at end of stream too..
@@ -714,22 +841,22 @@ struct dyesub_backend sonyupd_backend = {
 
    STATUS QUERY
 
- <- 1b e0 00 00 00 XX 00       # XX = 0xe (UP-D895), 0xf (All others)
+ <- 1b e0 00 00 00  XX 00       # XX = 0xe (UP-D895), 0xf (All others)
  -> [14 or 15 bytes, see 'struct sony_updsts' ]
 
    IMAGE DIMENSIONS & OVERCOAT
 
- <- 1b e1 00 00 00 0b 00
+ <- 1b e1 00 00 00  0b 00
  <- 00 ZZ QQ 00 00 00 00 XX XX YY YY  # XX = cols, YY == rows, ZZ == 0x04 on UP-DP10, otherwise 0x80. QQ == 00 glossy, 08 texture (UP-DP10 + UP-DR150), 0c matte, +0x10 for "nocorrection" on UP-DR200..
 
    UNKNOWN
 
- <- 1b e5 00 00 00 08 00
+ <- 1b e5 00 00 00  08 00
  <- 00 00 00 00 00 00 00 XX  00  # Seen 01, 12, 0d, etc.
 
    UNKNOWN  (UP-D897)
 
- <- 1b e6 00 00 00 08 00
+ <- 1b e6 00 00 00  08 00
  <- 07 00 00 00 00 00 00 00
 
    DATA TRANSFER
@@ -739,21 +866,21 @@ struct dyesub_backend sonyupd_backend = {
 
    UNKNOWN CMD (UP-DR and UP-D)
 
- <- 1b ed 00 00 00 00 00
+ <- 1b ed 00 00 00  00 00
 
-   UNKNOWN (UPDR series)
+   QUERY REMAINING PRINTS (UPDR series)
 
- <- 1b ef 00 00 00 06 00
- -> 05 00 00 00 00 22
+ <- 1b ef 00 00 00  06 00
+ -> 05 00 00 00 NN NN      # NN NN  print count on media remaining
 
    COPIES
 
- <- 1b ee 00 00 00 02 00
+ <- 1b ee 00 00 00  02 00
  <- NN NN                        # Number of copies (BE, 1-???)
 
    UNKNOWN (UPDR series)
 
- <- 1b f5 00 00 00 02 00
+ <- 1b f5 00 00 00  02 00
  <- ?? ??
 
   ************************************************************************
@@ -813,12 +940,15 @@ struct dyesub_backend sonyupd_backend = {
 
  **************
 
-  Sony UP-CL10 / DNP SL-10 spool format:
+  Sony UP-CL10 / DNP SL-10 / UP-CX1 spool format:
 
-60 ff ff ff f8 ff ff ff  fd ff ff ff
+60 ff ff ff
+f8 ff ff ff
+fd ff ff ff        (or: f0 ff ff ff)
 14 00 00 00
 1b 15 00 00 00 0d 00 00  00 00 00 07 00 00 00 00  WW WW HH HH
-fb ff ff ff f4 ff ff ff
+fb ff ff ff
+f4 ff ff ff
 0b 00 00 00
 1b ea 00 00 00 00 SH SH  SH SH 00
 SL SL SL SL
@@ -829,13 +959,14 @@ f3 ff ff ff
 0f 00 00 00
 1b e5 00 00 00 08 00 00  00 00 00 00 00 00 00
 12 00 00 00
-1b e1 00 00 00 0b 00 00  80 00 00 00 00 00 WW WW  HH HH
+1b e1 00 00 00 0b 00 00  80 GG 00 00 00 00 WW WW  HH HH
 fa ff ff ff
 09 00 00 00
 1b ee 00 00 00 02 00 00  NN
 07 00 00 00
 1b 0a 00 00 00 00 00
-f9 ff ff ff fc ff ff ff
+f9 ff ff ff
+fc ff ff ff
 07 00 00 00
 1b 17 00 00 00 00 00
 f7 ff ff ff
@@ -845,6 +976,7 @@ f7 ff ff ff
  SL SL SL SL == Plane size, Little Endian (Rows * Cols * 3)
  SH SH SH SH == Plane size, Big Endian (Rows * Cols * 3)
  NN == Copies
+ GG == Overcoat, 0x00 glossy, 0x0c matte (UP-CX1 only)
 
  **************
 
@@ -1003,22 +1135,46 @@ Other commands seen:
 
  <-- 1b 17 00 00 00 00 00   -- Unknown?
 
-   UP-CR10L
+ CR10L: status progression when printing:
 
-   2UPC-C13          (300)
-   2UPC-C14          (200)
-   2UPC-C15          (172)
+ 0e 00 00 00 00 00 00 00  04 a0 04 e0 07 38 00
+ 0e 00 00 01 00 80 00 01  04 a0 04 e0 07 38 64
+ 0e 00 40 01 00 80 00 01  04 a0 04 e0 07 38 64  <-- Y
+ 0e 00 80 01 00 80 00 01  04 a0 04 e0 07 38 64  <-- M
+ 0e 00 c0 01 00 80 00 01  04 a0 04 e0 07 38 64  <-- C
+ 0e 00 20 01 00 80 00 01  04 a0 04 e0 07 38 64  <-- O
+ 0e 00 20 01 00 80 00 01  04 a0 04 e0 07 38 00
+ 0e 00 00 01 00 80 00 01  04 a0 04 e0 07 38 00
+ 0e 00 00 00 00 00 00 00  04 a0 04 e0 07 38 00
 
- Status progression when printing:
+ UP-DR200 comms protocol:
 
- 0e 00 00 00 00 00 00 00 04 a0 04 e0 07 38 00
- 0e 00 00 01 00 80 00 01 04 a0 04 e0 07 38 64
- 0e 00 40 01 00 80 00 01 04 a0 04 e0 07 38 64  <-- Y
- 0e 00 80 01 00 80 00 01 04 a0 04 e0 07 38 64  <-- M
- 0e 00 c0 01 00 80 00 01 04 a0 04 e0 07 38 64  <-- C
- 0e 00 20 01 00 80 00 01 04 a0 04 e0 07 38 64  <-- O
- 0e 00 20 01 00 80 00 01 04 a0 04 e0 07 38 00
- 0e 00 00 01 00 80 00 01 04 a0 04 e0 07 38 00
- 0e 00 00 00 00 00 00 00 04 a0 04 e0 07 38 00
+ <-- 1b e0 00 00 00 0f 00
+ --> 0e 00 XX NN E0 E1 00 E3  RT PT CC CC RR RR %%
+
+  XX : Print state (eg Y/M/C/O -- see UPD_PRINTING_* )
+  E0 : Error code0 (see UPD_STS0_*)
+  E1 : Error code1 (see UPD_STS1_*)
+  E3 : Unknown (00 or 01)
+  NN : Number of remaining copies  (00 when complete/idle)
+  CC : Max Cols (0x0800 on 6" ribbon)
+  RR : Max Rows (0x0aa4 on 6x8)
+  RT : Ribbon type (04 = R206/8x6)
+  PT : Paper type  (38 = empty, a8 = 6")
+  %% : Percentage complete (0-99)
+
+ Seen on UP-DR200:
+
+ 0e 00 00 00 00 00 00 00  04 a8 08 00 0a a4 00   READY   (R206 6x8 ribbon)
+ 0e 00 00 00 40 00 00 00  04 a8 08 00 0a a4 00   DOOR OPEN
+ 0e 00 00 00 20 00 00 00  04 38 08 00 0a a4 00   LOAD PAPER
+ 0e 00 00 00 10 08 00 00  00 a8 08 00 0a a4 00   LOAD RIBBON
+
+ 0e 00 00 01 00 c0 00 01  04 a8 08 00 0a a4 00   PRINT START
+ 0e 00 40 01 00 c0 00 01  04 a8 08 00 0a a4 %%   PRINT Y
+ 0e 00 80 01 00 c0 00 01  04 a8 08 00 0a a4 %%   PRINT M
+ 0e 00 c0 01 00 c0 00 01  04 a8 08 00 0a a4 %%   PRINT C
+ 0e 00 20 01 00 c0 00 01  04 a8 08 00 0a a4 %%   PRINT OC
+ 0e 00 00 00 00 00 00 00  04 a8 08 00 0a a4 00   PRINT DONE / READY
 
 */

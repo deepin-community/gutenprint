@@ -99,6 +99,7 @@ libgutenprintui2.so.2 libgutenprintui2-2 #MINVER#
  yyalloc@Base 5.3.0~pre1
  yychar@Base 5.3.0~pre1
  yydebug@Base 5.3.1
+#MISSING: 5.3.3-8# yydebug@Base 5.3.1
  yyerrflag@Base 5.3.1
  yyfree@Base 5.3.0~pre1
  yyget_debug@Base 5.3.0~pre1

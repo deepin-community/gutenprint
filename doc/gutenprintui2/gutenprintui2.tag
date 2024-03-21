@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
-<tagfile>
+<tagfile doxygen_version="1.9.3">
   <compound kind="file">
     <name>curve.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprintui2/</path>
-    <filename>curve_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprintui2/</path>
+    <filename>curve_8h.html</filename>
     <class kind="struct">_StpuiCurve</class>
     <class kind="struct">_StpuiCurveClass</class>
     <member kind="define">
@@ -98,7 +98,7 @@
       <type>GtkWidget *</type>
       <name>stpui_curve_new</name>
       <anchorfile>curve_8h.html</anchorfile>
-      <anchor>acbdc99aaef1f5672d0294d9742fdc398</anchor>
+      <anchor>abbaca66cb2f4d6570a366b01e7e60066</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -146,8 +146,8 @@
   </compound>
   <compound kind="file">
     <name>gammacurve.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprintui2/</path>
-    <filename>gammacurve_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprintui2/</path>
+    <filename>gammacurve_8h.html</filename>
     <class kind="struct">_StpuiGammaCurve</class>
     <class kind="struct">_StpuiGammaCurveClass</class>
     <member kind="define">
@@ -217,14 +217,14 @@
       <type>GtkWidget *</type>
       <name>stpui_gamma_curve_new</name>
       <anchorfile>gammacurve_8h.html</anchorfile>
-      <anchor>a39433a30aa8d9b5a4e3fd1aa4176eb2f</anchor>
+      <anchor>a305e5fd23fc232c3a8fff7522c515adf</anchor>
       <arglist>(void)</arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>gutenprintui.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprintui2/</path>
-    <filename>gutenprintui_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprintui2/</path>
+    <filename>gutenprintui_8h.html</filename>
     <includes id="curve_8h" name="curve.h" local="no" imported="no">gutenprintui2/curve.h</includes>
     <includes id="gammacurve_8h" name="gammacurve.h" local="no" imported="no">gutenprintui2/gammacurve.h</includes>
     <includes id="typebuiltins_8h" name="typebuiltins.h" local="no" imported="no">gutenprintui2/typebuiltins.h</includes>
@@ -234,14 +234,14 @@
       <type>struct stpui_image</type>
       <name>stpui_image_t</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a195aac96c77c6de3925cd3d13c6ce2f1</anchor>
+      <anchor>ac0f15eb7d4e80aa6e92b7193cc1b5f02</anchor>
       <arglist></arglist>
     </member>
     <member kind="typedef">
       <type>guchar *(*</type>
       <name>get_thumbnail_func_t</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>aadb67e105722575789794519f6491cc6</anchor>
+      <anchor>a90b87e978f959729a19feff01108bafc</anchor>
       <arglist>)(void *data, gint *width, gint *height, gint *bpp, gint page)</arglist>
     </member>
     <member kind="enumeration">
@@ -324,7 +324,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_name</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a342817c9f4311f0ac827c94b0e62cbbb</anchor>
+      <anchor>afe6487da10d955c875589894b4820b06</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -345,7 +345,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_queue_name</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>aacf031afbe7e9682f7367f1ae0ef1895</anchor>
+      <anchor>a282c0413fe6485e16dd17022ab743b44</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -366,7 +366,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_output_filename</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a856c534e664748c9a419104357312dfd</anchor>
+      <anchor>a15987558b507410e38921695e31dd207</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -387,7 +387,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_extra_printer_options</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a4956cdd55680ed20a92e991d4cf52ee8</anchor>
+      <anchor>aeec4e2a74c2bb48f91add89cbefd5387</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -408,7 +408,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_custom_command</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>abc624051678aac91a2ffa6c7c5393b8d</anchor>
+      <anchor>ac221f5c74f7702214fb7eb6954c3ce48</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -443,7 +443,7 @@
       <type>const char *</type>
       <name>stpui_plist_get_current_standard_command</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>afdc574a731f6697c3e48c6001a51b3af</anchor>
+      <anchor>a8d38cb08db07aabb207016257d29842a</anchor>
       <arglist>(const stpui_plist_t *p)</arglist>
     </member>
     <member kind="function">
@@ -471,7 +471,7 @@
       <type>const char *</type>
       <name>stpui_get_global_parameter</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a28c71e75188d60a243755deaab31b5fd</anchor>
+      <anchor>a99f22f203a81eb632d8f53ea82384043</anchor>
       <arglist>(const char *param)</arglist>
     </member>
     <member kind="function">
@@ -499,14 +499,14 @@
       <type>const stpui_plist_t *</type>
       <name>stpui_get_current_printer</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a26ebbd1948a457740cd75ff630969487</anchor>
+      <anchor>ae2b067d91e53969b0553e78ab899a5e4</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>char *</type>
       <name>stpui_build_standard_print_command</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a97f0f11c41859d80d9bb3803f81a671f</anchor>
+      <anchor>a1fdb89412a62268d118e93ca88e378b2</anchor>
       <arglist>(const stpui_plist_t *plist, const stp_printer_t *printer)</arglist>
     </member>
     <member kind="function">
@@ -520,7 +520,7 @@
       <type>const char *</type>
       <name>stpui_get_printrc_file</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a8faab74e1f9c2b372efa56ae6fea713e</anchor>
+      <anchor>aa6f960720a4fd24297e4529b385dd8a0</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -555,7 +555,7 @@
       <type>const char *</type>
       <name>stpui_get_image_filename</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a8bc64271197449021140ce2d17ad71e2</anchor>
+      <anchor>ac928b58d6228827a38448a2530b7b0f0</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -583,7 +583,7 @@
       <type>void *</type>
       <name>stpui_get_errdata</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>a15368f674e52b511ad665cb2be45576c</anchor>
+      <anchor>a16f064d2b36ce9918c086bb93d593467</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -660,7 +660,7 @@
       <type>void *</type>
       <name>stpui_get_thumbnail_data</name>
       <anchorfile>gutenprintui_8h.html</anchorfile>
-      <anchor>aee04dfc45b26093bd65d3025b817cfd5</anchor>
+      <anchor>ae81d7c7fd94c6004f9a94e206c251ba2</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -673,8 +673,8 @@
   </compound>
   <compound kind="file">
     <name>typebuiltins.h</name>
-    <path>/home/rlk/sandbox/gimp-print-source/include/gutenprintui2/</path>
-    <filename>typebuiltins_8h</filename>
+    <path>/home/rlk/sandbox/gutenprint-snapshot/include/gutenprintui2/</path>
+    <filename>typebuiltins_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>STPUI_TYPE_CURVE_TYPE</name>
@@ -841,7 +841,7 @@
       <type>void(*</type>
       <name>curve_type_changed</name>
       <anchorfile>struct__StpuiCurveClass.html</anchorfile>
-      <anchor>a898b666f24897c058c34e65d65d10b3f</anchor>
+      <anchor>a09338581993dd6266f402f75573bfc7a</anchor>
       <arglist>)(StpuiCurve *curve)</arglist>
     </member>
     <member kind="variable">

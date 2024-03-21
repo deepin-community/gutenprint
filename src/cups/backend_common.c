@@ -1,11 +1,11 @@
 /*
  *   CUPS Backend common code
  *
- *   Copyright (c) 2007-2019 Solomon Peachy <pizza@shaftnet.org>
+ *   Copyright (c) 2007-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -18,9 +18,7 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
@@ -28,10 +26,17 @@
 
 #include "backend_common.h"
 #include <errno.h>
+#include <signal.h>
+#include <strings.h>  /* For strncasecmp */
 
-#define BACKEND_VERSION "0.94G"
-#ifndef URI_PREFIX
-#error "Must Define URI_PREFIX"
+#define BACKEND_VERSION "0.123G"
+
+#ifndef CORRTABLE_PATH
+#ifdef PACKAGE_DATA_DIR
+#define CORRTABLE_PATH PACKAGE_DATA_DIR "/backend_data"
+#else
+#error "Must define CORRTABLE_PATH or PACKAGE_DATA_DIR!"
+#endif
 #endif
 
 #define URB_XFER_SIZE  (64*1024)
@@ -51,11 +56,19 @@ int extra_type = -1;
 int ncopies = 1;
 int collate = 0;
 int test_mode = 0;
-int old_uri = 0;
 int quiet = 0;
+int stats_only = 0;
+FILE *logger;
 
+const char *corrtable_path = CORRTABLE_PATH;
 static int max_xfer_size = URB_XFER_SIZE;
 static int xfer_timeout = XFER_TIMEOUT;
+
+#ifdef OLD_URI
+static int old_uri = 1;
+#else
+static int old_uri = 0;
+#endif
 
 /* Support Functions */
 int backend_claim_interface(struct libusb_device_handle *dev, int iface,
@@ -105,7 +118,7 @@ static int lookup_printer_type(struct dyesub_backend *backend, uint16_t idVendor
 
 /* Interface **MUST** already be claimed! */
 #define ID_BUF_SIZE 2048
-static char *get_device_id(struct libusb_device_handle *dev, int iface)
+char *get_device_id(struct libusb_device_handle *dev, int iface)
 {
 	int length;
 	char *buf = malloc(ID_BUF_SIZE + 1);
@@ -155,14 +168,7 @@ done:
 }
 
 /* Used with the IEEE1284 deviceid string parsing */
-struct deviceid_dict {
-	char *key;
-	char *val;
-};
-
-#define MAX_DICT 32
-
-static int parse1284_data(const char *device_id, struct deviceid_dict* dict)
+int parse1284_data(const char *device_id, struct deviceid_dict* dict)
 {
 	char *ptr;
 	char key[256];
@@ -170,7 +176,7 @@ static int parse1284_data(const char *device_id, struct deviceid_dict* dict)
 	int num = 0;
 
 	if (!device_id)
-		return 0;
+		return CUPS_BACKEND_OK;
 
 	//[whitespace]key[whitespace]:[whitespace]value[whitespace];
 	while (*device_id && num < MAX_DICT) {
@@ -195,8 +201,6 @@ static int parse1284_data(const char *device_id, struct deviceid_dict* dict)
 		/* Next up, value */
 		for (ptr = val; *device_id && *device_id != ';'; device_id++)
 			*ptr++ = *device_id;
-		if (!*device_id)
-			break;
 		while (ptr > val && *(ptr-1) == ' ')
 			ptr--;
 		*ptr = 0;
@@ -213,7 +217,7 @@ static int parse1284_data(const char *device_id, struct deviceid_dict* dict)
 	return num;
 }
 
-static char *dict_find(const char *key, int dlen, struct deviceid_dict* dict)
+char *dict_find(const char *key, int dlen, struct deviceid_dict* dict)
 {
 	while(dlen) {
 		if (!strcmp(key, dict->key))
@@ -225,22 +229,22 @@ static char *dict_find(const char *key, int dlen, struct deviceid_dict* dict)
 }
 
 /* I/O functions */
-int read_data(struct libusb_device_handle *dev, uint8_t endp,
-	      uint8_t *buf, int buflen, int *readlen)
+
+int read_data(struct dyesub_connection *conn, uint8_t *buf, int buflen, int *readlen)
 {
 	int ret;
 
 	/* Clear buffer */
 	memset(buf, 0, buflen);
 
-	ret = libusb_bulk_transfer(dev, endp,
+	ret = libusb_bulk_transfer(conn->dev, conn->endp_up,
 				   buf,
 				   buflen,
 				   readlen,
 				   xfer_timeout);
 
 	if (ret < 0) {
-		ERROR("Failure to receive data from printer (libusb error %d: (%d/%d from 0x%02x))\n", ret, *readlen, buflen, endp);
+		ERROR("Failure to receive data from printer (libusb error %d: (%d/%d from 0x%02x))\n", ret, *readlen, buflen, conn->endp_up);
 		goto done;
 	}
 
@@ -248,7 +252,7 @@ int read_data(struct libusb_device_handle *dev, uint8_t endp,
 		DEBUG("Received %d bytes from printer\n", *readlen);
 	}
 
-	if ((dyesub_debug > 1 && buflen < 4096) ||
+	if ((dyesub_debug > 1 && *readlen < 4096) ||
 	    dyesub_debug > 2) {
 		int i = *readlen;
 
@@ -269,8 +273,7 @@ done:
 	return ret;
 }
 
-int send_data(struct libusb_device_handle *dev, uint8_t endp,
-	      const uint8_t *buf, int len)
+int send_data(struct dyesub_connection *conn, const uint8_t *buf, int len)
 {
 	int num = 0;
 
@@ -280,45 +283,48 @@ int send_data(struct libusb_device_handle *dev, uint8_t endp,
 
 	while (len) {
 		int len2 = (len > max_xfer_size) ? max_xfer_size: len;
-		int ret = libusb_bulk_transfer(dev, endp,
-					       (uint8_t*) buf, len2,
-					       &num, xfer_timeout);
 
-		if ((dyesub_debug > 1 && len < 4096) ||
+		if ((dyesub_debug > 1 && len2 < 4096) ||
 		    dyesub_debug > 2) {
-			int i = num;
+			int i = len2;
 
 			DEBUG("-> ");
 			while(i > 0) {
-				if ((num-i) != 0 &&
-				    (num-i) % 16 == 0) {
+				if ((len2-i) != 0 &&
+				    (len2-i) % 16 == 0) {
 					DEBUG2("\n");
 					DEBUG("   ");
 				}
-				DEBUG2("%02x ", buf[num-i]);
+				DEBUG2("%02x ", buf[len2-i]);
 				i--;
 			}
 			DEBUG2("\n");
 		}
 
+		int ret = libusb_bulk_transfer(conn->dev, conn->endp_down,
+					       (uint8_t*) buf, len2,
+					       &num, xfer_timeout);
+
 		if (ret < 0) {
-			ERROR("Failure to send data to printer (libusb error %d: (%d/%d to 0x%02x))\n", ret, num, len2, endp);
+			ERROR("Failure to send data to printer (libusb error %d: (%d/%d to 0x%02x))\n", ret, num, len2, conn->endp_down);
 			return ret;
 		}
 		len -= num;
 		buf += num;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 /* More stuff */
+#ifndef _WIN32
 static void sigterm_handler(int signum) {
 	UNUSED(signum);
 
 	terminate = 1;
 	INFO("Job Cancelled");
 }
+#endif
 
 static char *sanitize_string(char *str) {
 	int len = strlen(str);
@@ -334,7 +340,7 @@ static char *sanitize_string(char *str) {
 
    These functions are Public Domain code obtained from:
 
-   http://www.geekhideout.com/urlcode.shtml
+   https://www.geekhideout.com/urlcode.shtml
 
 */
 #include <ctype.h>  /* for isalnum() */
@@ -346,8 +352,10 @@ static char from_hex(char ch) {
 	return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
 }
 /* Note -- caller must free returned pointer! */
-static char *url_encode(char *str) {
-	char *pstr = str, *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
+static char *url_encode(const char *str) {
+	const char *pstr = str;
+	char *buf = malloc(strlen(str) * 3 + 1);
+	char *pbuf = buf;
 
 	if (!buf) {
 		ERROR("Memory allocation failure (%d bytes)\n", (int) strlen(str)*3 + 1);
@@ -395,12 +403,11 @@ static char *url_decode(char *str) {
 
 static int probe_device(struct libusb_device *device,
 			struct libusb_device_descriptor *desc,
-			const char *uri_prefix,
-			const char *prefix, char *manuf_override,
+			const char *make,
+			const char *uri_prefix, const char *manuf_override,
 			int found, int num_claim_attempts,
-			int scan_only, char *match_serno,
-			uint8_t *r_iface, uint8_t *r_altset,
-			uint8_t *r_endp_up, uint8_t *r_endp_down,
+			int scan_only, const char *match_serno,
+			struct dyesub_connection *conn,
 			struct dyesub_backend *backend)
 {
 	struct libusb_device_handle *dev;
@@ -415,15 +422,37 @@ static int probe_device(struct libusb_device *device,
 	uint8_t endp_up, endp_down;
 
 	DEBUG("Probing VID: %04X PID: %04x\n", desc->idVendor, desc->idProduct);
-	STATE("+connecting-to-device\n");
 
-	if (libusb_open(device, &dev)) {
-		ERROR("Could not open device %04x:%04x (need to be root?)\n", desc->idVendor, desc->idProduct);
+	if ((i = libusb_open(device, &dev))) {
+#ifdef _WIN32
+		if (i == LIBUSB_ERROR_NOT_SUPPORTED)
+			ERROR("Could not open device %04x:%04x! (Genric USB driver missing, See README)\n", desc->idVendor, desc->idProduct);
+		else
+#endif
+			ERROR("Could not open device %04x:%04x - %d (need to be root?)\n", desc->idVendor, desc->idProduct, i);
 		found = -1;
 		goto abort;
 	}
 
-	/* XXX FIXME:  Iterate through possible configurations? */
+#if 0
+	/* XXX FIXME: Iterate through bNumConfigurations */
+
+	/* Force reset of device configuration */
+	{
+		int cfgnum = -1;
+		if (libusb_get_configuration(dev, &cfgnum)) {
+			ERROR("Can't get config!");
+		}
+		INFO("Config %d\n", config);
+		if (config < 1)
+			cfgnum = 1;
+		if (libusb_set_configuration(dev, cfgnum)) {
+			ERROR("Can't set config\n");
+		}
+	}
+#endif
+
+	/* Get descriptor for active configuration */
 	if (libusb_get_active_config_descriptor(device, &config)) {
 		found  = -1;
 		goto abort_close;
@@ -437,7 +466,9 @@ static int probe_device(struct libusb_device *device,
 				continue;
 			}
 
-#if 1
+			/* Note we actually only match on explicit VID+PIDs so there's no need to filter based
+			   on specific class/type */
+
 			/* Explicitly exclude IPP-over-USB interfaces */
 			if (desc->bDeviceClass == LIBUSB_CLASS_PER_INTERFACE &&
 			    config->interface[iface].altsetting[altset].bInterfaceClass == LIBUSB_CLASS_PRINTER &&
@@ -445,16 +476,6 @@ static int probe_device(struct libusb_device *device,
 			    config->interface[iface].altsetting[altset].bInterfaceProtocol == USB_INTERFACE_PROTOCOL_IPP) {
 				continue;
 			}
-#else
-			// Make sure it's a printer class device that supports bidir comms  (XXX Is this necessarily true?)
-			if (desc->bDeviceClass == LIBUSB_CLASS_PRINTER ||
-			    (desc->bDeviceClass == LIBUSB_CLASS_PER_INTERFACE &&
-			     config->interface[iface].altsetting[altset].bInterfaceClass == LIBUSB_CLASS_PRINTER &&
-			     config->interface[iface].altsetting[altset].bInterfaceSubClass == USB_SUBCLASS_PRINTER &&
-			     config->interface[iface].altsetting[altset].bInterfaceProtocol != USB_INTERFACE_PROTOCOL_BIDIR)) {
-				continue;
-			}
-#endif
 
 			/* Find the first set of endpoints! */
 			endp_up = endp_down = 0;
@@ -508,32 +529,44 @@ candidate:
 		dlen = parse1284_data(ieee_id, dict);
 	}
 
-	/* Look up mfg string. */
+	if (!old_uri && !scan_only && !dyesub_debug) goto skip_manuf_model;
+
+	/* Look up mfg string in IEEE1284 data */
 	if (manuf_override && strlen(manuf_override)) {
-		manuf = url_encode(manuf_override);  /* Backend supplied */
+		manuf = url_encode(manuf_override);
 	} else if ((manuf = dict_find("MANUFACTURER", dlen, dict))) {
 		manuf = url_encode(manuf);
 	} else if ((manuf = dict_find("MFG", dlen, dict))) {
 		manuf = url_encode(manuf);
 	} else if ((manuf = dict_find("MFR", dlen, dict))) {
 		manuf = url_encode(manuf);
-	} else if (desc->iManufacturer) { /* Get from USB descriptor */
+	}
+
+	/* If no manufacturer string, fall back to USB iManufacturer */
+	if ((!manuf || !strlen(manuf)) &&
+	    desc->iManufacturer) {
 		buf[0] = 0;
 		libusb_get_string_descriptor_ascii(dev, desc->iManufacturer, (unsigned char*)buf, STR_LEN_MAX);
 		sanitize_string(buf);
 		manuf = url_encode(buf);
 	}
+
 	if (!manuf || !strlen(manuf)) {  /* Last-ditch */
 		if (manuf) free(manuf);
+		WARNING("**** THIS PRINTER DOES NOT REPORT A VALID MANUFACTURER STRING!\n");
 		manuf = url_encode("Unknown"); // XXX use USB VID?
 	}
 
-	/* Look up model number */
+	/* Look up model string in IEEE1284 data */
 	if ((product = dict_find("MODEL", dlen, dict))) {
 		product = url_encode(product);
 	} else if ((product = dict_find("MDL", dlen, dict))) {
 		product = url_encode(product);
-	} else if (desc->iProduct) {  /* Get from USB descriptor */
+	}
+
+	/* If no manufacturer string, fall back to USB iProduct */
+	if ((!product || !strlen(product)) &&
+	    desc->iProduct) {
 		buf[0] = 0;
 		libusb_get_string_descriptor_ascii(dev, desc->iProduct, (unsigned char*)buf, STR_LEN_MAX);
 		sanitize_string(buf);
@@ -542,15 +575,17 @@ candidate:
 
 	if (!product || !strlen(product)) { /* Last-ditch */
 		if (!product) free(product);
+		WARNING("**** THIS PRINTER DOES NOT REPORT A VALID MODEL STRING!\n");
 		product = url_encode("Unknown"); // XXX Use USB PID?
 	}
 
-	/* Look up description */
+	/* Look up decription string in IEEE1284 data */
 	if ((descr = dict_find("DESCRIPTION", dlen, dict))) {
 		descr = strdup(descr);
 	} else if ((descr = dict_find("DES", dlen, dict))) {
 		descr = strdup(descr);
 	}
+
 	if (!descr || !strlen(descr)) { /* Last-ditch, generate */
 		char *product2 = url_decode(product);
 		char *manuf3 = url_decode(manuf);
@@ -569,7 +604,9 @@ candidate:
 		free(manuf3);
 	}
 
-	/* Look up serial number */
+skip_manuf_model:
+
+	/* Prefer IEEE1284-reported serial number */
 	if ((serial = dict_find("SERIALNUMBER", dlen, dict))) {
 		serial = url_encode(serial);
 	} else if ((serial = dict_find("SN", dlen, dict))) {
@@ -578,18 +615,35 @@ candidate:
 		serial = url_encode(serial);
 	} else if ((serial = dict_find("SERN", dlen, dict))) {
 		serial = url_encode(serial);
-	} else if (desc->iSerialNumber) {  /* Get from USB descriptor */
+	}
+
+	/* If it's not valid, fall back to USB iSerial */
+	if ((!serial || !strlen(serial)) &&
+	    !(backend->flags & BACKEND_FLAG_BADISERIAL) &&
+	    desc->iSerialNumber) {
 		libusb_get_string_descriptor_ascii(dev, desc->iSerialNumber, (unsigned char*)buf, STR_LEN_MAX);
 		sanitize_string(buf);
 		serial = url_encode(buf);
-	} else if (backend->query_serno) { /* Get from backend hook */
-		buf[0] = 0;
-		/* Ignore result since a failure isn't critical here */
-		backend->query_serno(dev, endp_up, endp_down, buf, STR_LEN_MAX);
+	}
+
+	/* TODO: What about situations where iSerial does not match IEEE1284?
+	         Or if the '1284 data is bogus? */
+
+	/* If still no serial, fall back to backend hook */
+	if ((!serial || !strlen(serial)) &&
+	    backend->query_serno) { /* Get from backend hook */
+		struct dyesub_connection c2;
+		c2.dev = dev;
+		c2.iface = iface;
+		c2.altset = altset;
+		c2.endp_up = endp_up;
+		c2.endp_down = endp_down;
+		backend->query_serno(&c2, buf, STR_LEN_MAX);
 		serial = url_encode(buf);
 	}
 
-	if (!serial || !strlen(serial)) {  /* Last-ditch */
+	/* Last-ditch serial number fallback */
+	if (!serial || !strlen(serial)) {
 		if (serial) free(serial);
 		WARNING("**** THIS PRINTER DOES NOT REPORT A SERIAL NUMBER!\n");
 		WARNING("**** If you intend to use multiple printers of this type, you\n");
@@ -600,7 +654,7 @@ candidate:
 	if (scan_only) {
 		if (!old_uri) {
 			fprintf(stdout, "direct %s://%s/%s \"%s\" \"%s\" \"%s\" \"\"\n",
-				prefix, uri_prefix, serial,
+				uri_prefix, make, serial,
 				descr, descr,
 				ieee_id ? ieee_id : "");
 		} else {
@@ -615,7 +669,7 @@ candidate:
 			strncpy(buf + k, product, sizeof(buf)-k);
 
 			fprintf(stdout, "direct %s://%s?serial=%s&backend=%s \"%s\" \"%s\" \"%s\" \"\"\n",
-				prefix, buf, serial, uri_prefix,
+				uri_prefix, buf, serial, make,
 				descr, descr,
 				ieee_id? ieee_id : "");
 		}
@@ -626,15 +680,20 @@ candidate:
 		found = -1;
 	}
 
-	if (dyesub_debug)
-		DEBUG("VID: %04X PID: %04X Manuf: '%s' Product: '%s' Serial: '%s' found: %d\n",
-		      desc->idVendor, desc->idProduct, manuf, product, serial, found);
+	uint8_t bus_num = libusb_get_bus_number(device);
+	uint8_t port_num = libusb_get_port_number(device);
 
-	if (found != -1) {
-		if (r_iface) *r_iface = iface;
-		if (r_altset) *r_altset = altset;
-		if (r_endp_up) *r_endp_up = endp_up;
-		if (r_endp_up) *r_endp_down = endp_down;
+	if (dyesub_debug)
+		DEBUG("VID/PID %04X/%04X @ bus/port %03d/%03d Manuf: '%s' Product: '%s' Serial: '%s' found: %d\n",
+		      desc->idVendor, desc->idProduct, bus_num, port_num, manuf, product, serial, found);
+
+	if (found != -1 && conn) {
+		conn->iface = iface;
+		conn->altset = altset;
+		conn->endp_up = endp_up;
+		conn->endp_down = endp_down;
+		conn->bus_num = bus_num;
+		conn->port_num = port_num;
 	}
 
 	/* Free things up */
@@ -661,8 +720,6 @@ abort:
 		free (dict[dlen].val);
 	}
 
-	STATE("-connecting-to-device\n");
-
 	return found;
 }
 
@@ -679,6 +736,7 @@ extern struct dyesub_backend sonyupdneo_backend;
 extern struct dyesub_backend kodak6800_backend;
 extern struct dyesub_backend kodak605_backend;
 extern struct dyesub_backend kodak1400_backend;
+extern struct dyesub_backend kodak8800_backend;
 extern struct dyesub_backend shinkos1245_backend;
 extern struct dyesub_backend shinkos2145_backend;
 extern struct dyesub_backend shinkos6145_backend;
@@ -691,6 +749,7 @@ extern struct dyesub_backend mitsup95d_backend;
 extern struct dyesub_backend dnpds40_backend;
 extern struct dyesub_backend magicard_backend;
 extern struct dyesub_backend mitsud90_backend;
+extern struct dyesub_backend hiti_backend;
 
 static struct dyesub_backend *backends[] = {
 	&canonselphy_backend,
@@ -698,55 +757,78 @@ static struct dyesub_backend *backends[] = {
 	&kodak6800_backend,
 	&kodak605_backend,
 	&kodak1400_backend,
+	&kodak8800_backend,
 	&shinkos1245_backend,
 	&shinkos2145_backend,
 	&shinkos6145_backend,
 	&shinkos6245_backend,
 	&sonyupd_backend,
+	&sonyupdneo_backend,
 	&mitsu70x_backend,
 	&mitsud90_backend,
 	&mitsu9550_backend,
 	&mitsup95d_backend,
 	&dnpds40_backend,
 	&magicard_backend,
+	&hiti_backend,
 	NULL,
 };
 
-static int find_and_enumerate(struct libusb_context *ctx,
+static int find_and_enumerate(const char *argv0,
 			      struct libusb_device ***list,
-			      struct dyesub_backend *backend,
-			      char *match_serno,
+			      const struct dyesub_backend *backend,
+			      const char *match_serno,
+			      const char *make,
 			      int scan_only, int num_claim_attempts,
-			      uint8_t *r_iface, uint8_t *r_altset,
-			      uint8_t *r_endp_up, uint8_t *r_endp_down)
+			      struct dyesub_connection *conn)
 {
 	int num;
 	int i, j = 0, k;
 	int found = -1;
-	const char *prefix = NULL;
 
-	if (test_mode >= TEST_MODE_NOATTACH) {
+	if (test_mode >= TEST_MODE_NOATTACH && conn) {
 		found = 1;
-		*r_endp_up = 0x82;
-		*r_endp_down = 0x01;
-		*r_iface = 0;
-		*r_altset = 0;
+		conn->endp_up = 0x82;
+		conn->endp_down = 0x01;
+		conn->iface = 0;
+		conn->altset = 0;
 		return found;
 	}
 
-	STATE("+org.gutenprint-searching-for-device\n");
+	STATE("+org.gutenprint.searching-for-device\n");
 
 	/* Enumerate and find suitable device */
-	num = libusb_get_device_list(ctx, list);
+	num = libusb_get_device_list(NULL, list);
+
+	/* See if we can actually match on the supplied make! */
+	if (backend && make) {
+		int match = 0;
+		for (j = 0 ; backend->devices[j].vid ; j++) {
+			if (!strcmp(make,backend->devices[j].make)) {
+				match = 1;
+				break;
+			}
+		}
+		/* If not, clear it */
+		if (!match)
+			make = NULL;
+	} else {
+		make = NULL; /* Explicitly clear it */
+	}
 
 	for (i = 0 ; i < num ; i++) {
+		const char *foundmake = NULL;
+
 		struct libusb_device_descriptor desc;
 		libusb_get_device_descriptor((*list)[i], &desc);
 
 		for (k = 0 ; backends[k] ; k++) {
 			if (backend && backend != backends[k])
 				continue;
+
 			for (j = 0 ; backends[k]->devices[j].vid ; j++) {
+				/* Try for extra pid/vid/type */
+				// XXX nuke entire extra_??? concept?
 				if (extra_pid != -1 &&
 				    extra_vid != -1 &&
 				    extra_type != -1) {
@@ -754,16 +836,19 @@ static int find_and_enumerate(struct libusb_context *ctx,
 					    extra_vid == desc.idVendor &&
 					    extra_pid == desc.idProduct) {
 						found = i;
-						prefix = backends[k]->uri_prefixes[0];
+						make = backends[k]->uri_prefixes[0];
 						goto match;
 					}
 				}
+
+				/* Match based on VID/PID (and prefix, if specified) */
 				if (desc.idVendor == backends[k]->devices[j].vid &&
 				    (desc.idProduct == backends[k]->devices[j].pid ||
-				     desc.idProduct == 0xffff)) {
-					prefix = backends[k]->devices[j].prefix;
-					found = i;
-					goto match;
+				     desc.idProduct == 0xffff) &&
+				    (!make || !strcmp(make,backends[k]->devices[j].make))) {
+					    found = i;
+					    foundmake = backends[k]->devices[j].make;
+					    goto match;
 				}
 			}
 		}
@@ -771,23 +856,22 @@ static int find_and_enumerate(struct libusb_context *ctx,
 		continue;
 
 	match:
-		found = probe_device((*list)[i], &desc, prefix,
-				     URI_PREFIX, backends[k]->devices[j].manuf_str,
+		found = probe_device((*list)[i], &desc, (foundmake ? foundmake : make),
+				     argv0, backends[k]->devices[j].manuf_str,
 				     found, num_claim_attempts,
 				     scan_only, match_serno,
-				     r_iface, r_altset,
-				     r_endp_up, r_endp_down,
+				     conn,
 				     backends[k]);
-
+		foundmake = NULL;
 		if (found != -1 && !scan_only)
 			break;
 	}
 
-	STATE("-org.gutenprint-searching-for-device\n");
+	STATE("-org.gutenprint.searching-for-device\n");
 	return found;
 }
 
-static struct dyesub_backend *find_backend(char *uri_prefix)
+static struct dyesub_backend *find_backend(const char *uri_prefix)
 {
 	int i;
 
@@ -797,17 +881,23 @@ static struct dyesub_backend *find_backend(char *uri_prefix)
 	for (i = 0; ; i++) {
 		struct dyesub_backend *backend = backends[i];
 		const char **alias;
+		int j;
 		if (!backend)
 			return NULL;
 		for (alias = backend->uri_prefixes ; alias && *alias ; alias++) {
 			if (!strcmp(uri_prefix, *alias))
 				return backend;
 		}
+		for (j = 0 ; backend->devices[j].vid ; j++) {
+			if (!strcmp(uri_prefix,backend->devices[j].make)) {
+				return backend;
+			}
+		}
 	}
 	return NULL;
 }
 
-static int query_markers(struct dyesub_backend *backend, void *ctx, int full)
+static int query_markers(const struct dyesub_backend *backend, void *ctx, int full)
 {
 	struct marker *markers = NULL;
 	int marker_count = 0;
@@ -816,7 +906,7 @@ static int query_markers(struct dyesub_backend *backend, void *ctx, int full)
 	if (!backend->query_markers)
 		return CUPS_BACKEND_OK;
 
-	if (test_mode >= TEST_MODE_NOPRINT)
+	if (test_mode >= TEST_MODE_NOATTACH)
 		return CUPS_BACKEND_OK;
 
 	ret = backend->query_markers(ctx, &markers, &marker_count);
@@ -828,14 +918,104 @@ static int query_markers(struct dyesub_backend *backend, void *ctx, int full)
 	return CUPS_BACKEND_OK;
 }
 
+static void dump_stats(struct dyesub_backend *backend, struct printerstats *stats, int json)
+{
+	int i;
+	struct tm *tm;
+	char tmbuf[64];
+	tm = localtime(&stats->timestamp);
+
+	strftime(tmbuf, sizeof(tmbuf), "%Y-%m-%d %H:%M:%S", tm);
+
+	if (json) {
+		fprintf(stdout, "{\n");
+		fprintf(stdout, "\t\"backend\": \"%s\",\n", backend->name);
+		fprintf(stdout, "\t\"version\": \"%s / %s\",\n", BACKEND_VERSION, backend->version);
+		fprintf(stdout, "\t\"timestamp\": \"%s\",\n", tmbuf);
+		if (stats->mfg)
+			fprintf(stdout, "\t\"manufacturer\": \"%s\",\n", stats->mfg);
+		if (stats->model)
+			fprintf(stdout, "\t\"model\": \"%s\",\n", stats->model);
+		if (stats->serial)
+			fprintf(stdout, "\t\"serial\": \"%s\",\n", stats->serial);
+		if (stats->fwver)
+			fprintf(stdout, "\t\"firmware\": \"%s\",\n", stats->fwver);
+
+		fprintf(stdout, "\t\"decks\": {\n");
+		for (i = 0 ; i < stats->decks ; i++) {
+			fprintf(stdout, "\t\t\"%s\": {\n", stats->name[i]);
+			if (stats->status[i])
+				fprintf(stdout, "\t\t\t\"status\": \"%s\",\n", stats->status[i]);
+			fprintf(stdout, "\t\t\t\"mediatype\": \"%s\",\n", stats->mediatype[i]);
+			switch (stats->levelnow[i]) {
+			case CUPS_MARKER_UNKNOWN:
+				fprintf(stdout, "\t\t\t\"medialevel\": \"Unknown\",\n");
+				break;
+			case CUPS_MARKER_UNAVAILABLE:
+				fprintf(stdout, "\t\t\t\"medialevel\": \"Unavailable\",\n");
+				break;
+			case CUPS_MARKER_UNKNOWN_OK:
+				fprintf(stdout, "\t\t\t\"medialevel\": \"OK\",\n");
+				break;
+			default:
+				if (stats->levelnow[i] >= 0 && stats->levelmax[i] > 0) {
+					fprintf(stdout, "\t\t\t\"medialevel\": \"OK\",\n");
+					fprintf(stdout, "\t\t\t\"medialevelnow\": %d,\n", stats->levelnow[i]);
+					fprintf(stdout, "\t\t\t\"medialevelmax\": %d,\n", stats->levelmax[i]);
+				} else {
+				fprintf(stdout, "\t\t\t\"medialevel\": \"Illegal value\",\n");
+				}
+				break;
+			}
+			fprintf(stdout, "\t\t\t\"counters\": {\n");
+			if (stats->cnt_life[i] >= 0)
+				fprintf(stdout, "\t\t\t\t\"lifetime\": %d\n", stats->cnt_life[i]);
+
+			fprintf(stdout, "\t\t\t}\n");
+
+			fprintf(stdout, "\t\t}%c\n", (i < (stats->decks -1) ? ',': ' '));
+		}
+		fprintf(stdout, "\t}\n");
+		fprintf(stdout, "}\n");
+	} else {
+		fprintf(stdout, "Backend: %s\n", backend->name);
+		fprintf(stdout, "Version: %s / %s\n", BACKEND_VERSION, backend->version);
+		fprintf(stdout, "Timestamp: %s\n", tmbuf);
+		if (stats->mfg)
+			fprintf(stdout, "Manufacturer: %s\n", stats->mfg);
+		if (stats->model)
+			fprintf(stdout, "Model: %s\n", stats->model);
+		if (stats->serial)
+			fprintf(stdout, "Serial Number: %s\n", stats->serial);
+		if (stats->fwver)
+			fprintf(stdout, "Firmware Version: %s\n", stats->fwver);
+
+		for (i = 0 ; i < stats->decks ; i++) {
+			if (stats->status[i])
+				fprintf(stdout, "%s Status: %s\n", stats->name[i], stats->status[i]);
+			if (stats->cnt_life[i] >= 0)
+				fprintf(stdout, "%s Lifetime Prints: %d\n", stats->name[i], stats->cnt_life[i]);
+			fprintf(stdout, "%s Media Type: %s\n", stats->name[i], stats->mediatype[i]);
+			if (stats->levelnow[i] == CUPS_MARKER_UNKNOWN_OK)
+				fprintf(stdout, "%s Media Level: OK\n", stats->name[i]);
+			else if (stats->levelnow[i] == CUPS_MARKER_UNKNOWN)
+				fprintf(stdout, "%s Media Level: Unknown\n", stats->name[i]);
+			else if (stats->levelnow[i] == CUPS_MARKER_UNAVAILABLE)
+				fprintf(stdout, "%s Media Level: Unavailable\n", stats->name[i]);
+			else if (stats->levelnow[i] >= 0 && stats->levelmax[i] > 0)
+				fprintf(stdout, "%s Media Level: %d / %d\n", stats->name[i], stats->levelnow[i], stats->levelmax[i]);
+		}
+	}
+}
+
 void print_license_blurb(void)
 {
 	const char *license = "\n\
-Copyright 2007-2019 Solomon Peachy <pizza AT shaftnet DOT org>\n\
+Copyright 2007-2021 Solomon Peachy <pizza AT shaftnet DOT org>\n\
 \n\
 This program is free software; you can redistribute it and/or modify it\n\
 under the terms of the GNU General Public License as published by the Free\n\
-Software Foundation; either version 3 of the License, or (at your option)\n\
+Software Foundation; either version 2 of the License, or (at your option)\n\
 any later version.\n\
 \n\
 This program is distributed in the hope that it will be useful, but\n\
@@ -844,21 +1024,19 @@ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License\n\
 for more details.\n\
 \n\
 You should have received a copy of the GNU General Public License\n\
-along with this program.  If not, see https://www.gnu.org/licenses/.\n\
-\n          [http://www.gnu.org/licenses/gpl-2.0.html]\n\n";
+along with this program; if not, see <https://www.gnu.org/licenses/>.\n\n";
 
-	fprintf(stderr, "%s", license);
+	fprintf(logger, "%s", license);
 }
 
-void print_help(char *argv0, struct dyesub_backend *backend)
+void print_help(const char *argv0, const struct dyesub_backend *backend)
 {
-	struct libusb_context *ctx = NULL;
 	struct libusb_device **list = NULL;
 
-	char *ptr = strrchr(argv0, '/');
-	if (ptr)
-		ptr++;
-	else
+	const char *ptr = getenv("BACKEND");
+	if (!ptr)
+		ptr = getenv("DYESUB_BACKEND");
+	if (!ptr)
 		ptr = argv0;
 
 	if (!backend)
@@ -869,10 +1047,10 @@ void print_help(char *argv0, struct dyesub_backend *backend)
 		DEBUG("Environment variables:\n");
 		DEBUG(" DYESUB_DEBUG EXTRA_PID EXTRA_VID EXTRA_TYPE BACKEND SERIAL OLD_URI_SCHEME BACKEND_QUIET\n");
 		DEBUG("CUPS Usage:\n");
-		DEBUG("\tDEVICE_URI=someuri %s job user title num-copies options [ filename ]\n", URI_PREFIX);
+		DEBUG("\tDEVICE_URI=someuri %s job user title num-copies options [ filename ]\n", ptr);
 		DEBUG("\n");
 		DEBUG("Standalone Usage:\n");
-		DEBUG("\t%s\n", URI_PREFIX);
+		DEBUG("\t%s\n", ptr);
 		DEBUG("  [ -D ] [ -G ] [ -f ] [ -v ]\n");
 		DEBUG("  [ backend_specific_args ] \n");
 		DEBUG("  [ -d copies ] \n");
@@ -895,11 +1073,14 @@ void print_help(char *argv0, struct dyesub_backend *backend)
 		}
 	} else {
 		const char **alias;
+		int j;
 		DEBUG("Standalone %s backend version %s\n",
 		      backend->name, backend->version);
 		DEBUG("\t supporting: ");
 		for (alias = backend->uri_prefixes ; alias && *alias ; alias++)
 			DEBUG2("%s ", *alias);
+		for (j = 0 ; backend->devices[j].vid ; j++)
+			DEBUG2("%s ", backend->devices[j].make);
 		DEBUG2("\n");
 
 		DEBUG("\t[ -D ] [ -G ] [ -f ]\n");
@@ -908,12 +1089,12 @@ void print_help(char *argv0, struct dyesub_backend *backend)
 		DEBUG("\t[ -d copies ] [ infile | - ]\n");
 	}
 
-	/* Probe for printers */
-	find_and_enumerate(ctx, &list, backend, NULL, 1, 1, NULL, NULL, NULL, NULL);
+	/* Scan for all printers for the specified backend */
+	find_and_enumerate(argv0, &list, backend, NULL, ptr, 1, 1, NULL);
 	libusb_free_device_list(list, 1);
 }
 
-int parse_cmdstream(struct dyesub_backend *backend, void *backend_ctx, int fd)
+static int parse_cmdstream(struct dyesub_backend *backend, void *backend_ctx, int fd)
 {
 	FILE *fp = stdin;
 	char line[128];
@@ -951,41 +1132,181 @@ int parse_cmdstream(struct dyesub_backend *backend, void *backend_ctx, int fd)
 		fclose(fp);
 
 	return CUPS_BACKEND_OK;
-};
+}
+
+static int handle_input(struct dyesub_backend *backend, void *backend_ctx,
+			const char *fname, char *uri, char *type)
+{
+	int ret = CUPS_BACKEND_OK;
+	int i;
+	const void *jobs[MAX_JOBS_FROM_READ_PARSE];
+	int data_fd = fileno(stdin);
+	int read_page = 0, print_page = 0;
+	struct dyesub_joblist *jlist = NULL;
+
+	if (!fname) {
+		if (uri && strlen(uri))
+			ERROR("ERROR: No input file specified\n");
+		ret = CUPS_BACKEND_FAILED;
+		goto done;
+	}
+
+	if (ncopies < 1) {
+		ERROR("ERROR: need to have at least 1 copy!\n");
+		ret = CUPS_BACKEND_FAILED;
+		goto done;
+	}
+
+	/* Open file if not STDIN */
+	if (strcmp("-", fname)) {
+		data_fd = open(fname, O_RDONLY);
+		if (data_fd < 0) {
+			perror("ERROR:Can't open input file");
+			ret = CUPS_BACKEND_FAILED;
+			goto done;
+		}
+	}
+
+#ifndef _WIN32
+	/* Ensure we're using BLOCKING I/O */
+	i = fcntl(data_fd, F_GETFL, 0);
+	if (i < 0) {
+		perror("ERROR:Can't open input");
+		ret = CUPS_BACKEND_FAILED;
+		goto done;
+	}
+	i &= ~O_NONBLOCK;
+	i = fcntl(data_fd, F_SETFL, i);
+	if (i < 0) {
+		perror("ERROR:Can't open input");
+		ret = CUPS_BACKEND_FAILED;
+		goto done;
+	}
+
+	/* Ignore SIGPIPE */
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGTERM, sigterm_handler);
+#endif
+
+	/* See if it's a CUPS command stream, and if yes, handle it! */
+	if (type && !strcmp("application/vnd.cups-command", type))
+	{
+		INFO("CUPS Command mode\n");
+		ret = parse_cmdstream(backend, backend_ctx, data_fd);
+		goto done;
+	}
+
+	/* Time for the main processing loop */
+	INFO("Printing started (%d copies)\n", ncopies);
+
+	/* Emit a verbose marker dump */
+	ret = query_markers(backend, backend_ctx, 1);
+	if (ret)
+		goto done;
+
+newpage:
+	/* Read in data */
+	for (i = 0 ; i < MAX_JOBS_FROM_READ_PARSE ; i++)
+		jobs[i] = NULL;
+
+	if ((ret = backend->read_parse(backend_ctx, jobs, data_fd, ncopies))) {
+		if (read_page)
+			goto done_multiple;
+		else
+			goto done;
+	}
+
+	if (!jobs[0]) {
+		WARNING("No job returned by backend read_parse?\n");
+		goto newpage;
+	}
+
+	/* Create a joblist if needed */
+	if (!jlist) {
+		jlist = dyesub_joblist_create(backend, backend_ctx);
+	}
+	if (!jlist) {
+		for (i = 0 ; i < MAX_JOBS_FROM_READ_PARSE ; i++)
+			backend->cleanup_job(jobs[i]);
+		goto done;
+	}
+
+	/* Stick jobs onto the end of the list */
+	for (i = 0 ; i < MAX_JOBS_FROM_READ_PARSE ; i++) {
+		if (jobs[i])
+			dyesub_joblist_appendjob(jlist, jobs[i]);
+	}
+	read_page++;
+
+	INFO("Parsed page %d (%d copies)\n", read_page, ncopies);
+
+	/* If we get here, we can wait for another combined job, do so */
+	if (dyesub_joblist_canwait(jlist))
+		goto newpage;
+
+print_list:
+	/* Print the pagelist */
+	ret = dyesub_joblist_print(jlist, &print_page);
+	if (ret)
+		goto done;
+
+	dyesub_joblist_cleanup(jlist);
+	jlist = NULL;
+
+	/* Since we have no way of telling if there's more data remaining
+	   to be read (without actually trying to read it), always assume
+	   multiple print jobs. */
+	goto newpage;
+
+done_multiple:
+	if (jlist)
+		goto print_list;
+
+	close(data_fd);
+
+	ret = CUPS_BACKEND_OK;
+
+done:
+	if (jlist) dyesub_joblist_cleanup(jlist);
+
+	return ret;
+}
 
 int main (int argc, char **argv)
 {
-	struct libusb_context *ctx = NULL;
 	struct libusb_device **list = NULL;
-	struct libusb_device_handle *dev;
 
 	struct dyesub_backend *backend = NULL;
 	void * backend_ctx = NULL;
 
-	uint8_t endp_up, endp_down;
-	uint8_t iface, altset;
-
-	int data_fd = fileno(stdin);
-
-	const void *job = NULL;
-
-	int i;
+	struct dyesub_connection conn;
 
 	int ret = CUPS_BACKEND_OK;
 
 	int found = -1;
 	int jobid = 0;
-	int current_page = 0;
 
 	char *uri;
 	char *type;
-	char *fname = NULL;
+	const char *fname = NULL;
 	char *use_serno = NULL;
-	int  printer_type;
+	const char *backend_str = NULL;
+	const char *argv0;
+
+	/* Work out path-less executable name */
+	argv0 = strrchr(argv[0], '/');
+	if (argv0)
+		argv0++;
+	else
+		argv0 = argv[0];
+
+	logger = stderr;
 
 	/* Handle environment variables  */
 	if (getenv("BACKEND_QUIET"))
 		quiet = atoi(getenv("BACKEND_QUIET"));
+	if (getenv("BACKEND_STATS_ONLY"))
+		stats_only = atoi(getenv("BACKEND_STATS_ONLY"));
 	if (getenv("DYESUB_DEBUG"))
 		dyesub_debug = atoi(getenv("DYESUB_DEBUG"));
 	if (getenv("EXTRA_PID"))
@@ -995,9 +1316,11 @@ int main (int argc, char **argv)
 	if (getenv("EXTRA_TYPE"))
 		extra_type = atoi(getenv("EXTRA_TYPE"));
 	if (getenv("BACKEND"))
-		backend = find_backend(getenv("BACKEND"));
+		backend_str = getenv("BACKEND");
+	else if (getenv("DYESUB_BACKEND"))
+		backend_str = getenv("DYESUB_BACKEND");
 	if (getenv("FAST_RETURN"))
-		fast_return++;
+		fast_return = atoi(getenv("FAST_RETURN"));
 	if (getenv("MAX_XFER_SIZE"))
 		max_xfer_size = atoi(getenv("MAX_XFER_SIZE"));
 	if (getenv("XFER_TIMEOUT"))
@@ -1006,25 +1329,29 @@ int main (int argc, char **argv)
 		test_mode = atoi(getenv("TEST_MODE"));
 	if (getenv("OLD_URI_SCHEME"))
 		old_uri = atoi(getenv("OLD_URI_SCHEME"));
+	if (getenv("CORRTABLE_PATH"))
+		corrtable_path = getenv("CORRTABLE_PATH");
 
 	if (test_mode >= TEST_MODE_NOATTACH && (extra_vid == -1 || extra_pid == -1)) {
 		ERROR("Must specify EXTRA_VID, EXTRA_PID in test mode > 1!\n");
 		exit(1);
 	}
 
+	if (stats_only && !dyesub_debug)
+		quiet = 1;
+
 	DEBUG("Multi-Call Dye-sublimation CUPS Backend version %s\n",
 	      BACKEND_VERSION);
-	DEBUG("Copyright 2007-2019 Solomon Peachy\n");
+	DEBUG("Copyright 2007-2021 Solomon Peachy\n");
 	DEBUG("This free software comes with ABSOLUTELY NO WARRANTY! \n");
 	DEBUG("Licensed under the GNU GPL.  Run with '-G' for more details.\n");
 	DEBUG("\n");
 
 	use_serno = getenv("SERIAL");
 	uri = getenv("DEVICE_URI");  /* CUPS backend mode! */
-	type = getenv("FINAL_CONTENT_TYPE"); /* CUPS content type -- ie raster or command */
+	type = getenv("CONTENT_TYPE"); /* CUPS content type -- ie raster or command */
 
-	if (uri) {
-		/* CUPS backend mode */
+	if (uri && strlen(uri)) {  /* CUPS backend mode */
 		int base = optind; /* ie 1 */
 		if (argc < 6) {
 			ERROR("Insufficient arguments\n");
@@ -1041,71 +1368,67 @@ int main (int argc, char **argv)
 
 		/* Figure out backend based on URI */
 		{
-			char *ptr = strstr(uri, "backend="), *ptr2;
-			if (ptr) { /* Original format */
-				ptr += 8;
-				ptr2 = strchr(ptr, '&');
-				if (ptr2)
+			char *ptr2;
+			backend_str = strstr(uri, "backend=");
+			if (backend_str) { /* Original format */
+				backend_str += 8;
+				ptr2 = strchr(backend_str, '&');
+				if (ptr2) {
+					use_serno = strstr(ptr2, "serial=");
 					*ptr2 = 0;
-
-				backend = find_backend(ptr);
-				if (!backend) {
-					ERROR("Invalid backend (%s)\n", ptr);
-					exit(1);
 				}
-				if (ptr2)
-					*ptr2 = '&';
 
-				use_serno = strchr(uri, '=');
-				if (!use_serno || !*(use_serno+1)) {
+				if (!use_serno)
+					use_serno = strstr(uri, "serial=");
+
+				if (!use_serno || !*(use_serno+7)) {
 					ERROR("Invalid URI (%s)\n", uri);
 					exit(1);
 				}
-				use_serno++;
-				ptr = strchr(use_serno, '&');
-				if (ptr)
-					*ptr = 0;
+				use_serno += 7;
+
 			} else { /* New format */
 				// prefix://backend/serno
-				ptr = strchr(uri, '/');
-				ptr += 2;
-				use_serno = strchr(ptr, '/');
+				backend_str = strchr(uri, '/');
+				backend_str += 2;
+				use_serno = strchr(backend_str, '/');
 				if (!use_serno || !*(use_serno+1)) {
 					ERROR("Invalid URI (%s)\n", uri);
 					exit(1);
 				}
 				*use_serno = 0;
 				use_serno++;
+			}
 
-				backend = find_backend(ptr);
-				if (!backend) {
-					ERROR("Invalid backend (%s)\n", ptr);
-					exit(1);
-				}
-
-				ptr = strchr(ptr, '?');
-				if (ptr)
-					*ptr = 0;
+			if (use_serno) {
+				ptr2 = strchr(use_serno, '&');
+				if (ptr2)
+					*ptr2 = 0;
 			}
 		}
 
-		/* Always enable fast return in CUPS mode */
-		fast_return++;
-	} else {
-		/* Standalone mode */
+		/* Enable fast return in CUPS if it's not supplied */
+		if (!getenv("FAST_RETURN"))
+			fast_return++;
+
+	} else {  /* Standalone mode */
 
 		/* Try to guess backend from executable name */
-		if (!backend) {
-			char *ptr = strrchr(argv[0], '/');
-			if (ptr)
-				ptr++;
-			else
-				ptr = argv[0];
-			backend = find_backend(ptr);
-		}
+		if (!backend_str)
+			backend_str = argv0;
 
 		srand(getpid());
 		jobid = rand();
+	}
+
+	/* Finally, look up the backend */
+	backend = find_backend(backend_str);
+	if (!backend) {
+		if (uri && strlen(uri)) {
+			ERROR("Invalid backend requested (%s)\n", backend_str);
+			exit(1);
+		}
+		backend_str = NULL;
 	}
 
 #ifndef LIBUSB_PRE_1_0_10
@@ -1118,7 +1441,7 @@ int main (int argc, char **argv)
 #endif
 
 	/* Libusb setup */
-	ret = libusb_init(&ctx);
+	ret = libusb_init(NULL);
 	if (ret) {
 		ERROR("Failed to initialize libusb (%d)\n", ret);
 		ret = CUPS_BACKEND_RETRY_CURRENT;
@@ -1126,29 +1449,33 @@ int main (int argc, char **argv)
 	}
 
 	/* If we don't have a valid backend, print help and terminate */
-	if (!backend) {
-		print_help(argv[0], NULL); // probes all devices
+	if (!backend && !stats_only) {
+		print_help(argv0, NULL); // probes all devices
 		ret = CUPS_BACKEND_OK;
 		goto done;
 	}
 
 	/* If we're in standalone mode, print help only if no args */
-	if (!uri) {
+	if ((!uri || !strlen(uri)) && !stats_only) {
 		if (argc < 2) {
-			print_help(argv[0], backend); // probes all devices
+			print_help(argv0, backend); // probes all devices
 			ret = CUPS_BACKEND_OK;
 			goto done;
 		}
 	}
 
 	/* Enumerate devices */
-	found = find_and_enumerate(ctx, &list, backend, use_serno, 0, NUM_CLAIM_ATTEMPTS, &iface, &altset, &endp_up, &endp_down);
+	STATE("+connecting-to-device\n");
+
+	found = find_and_enumerate(argv0, &list, backend, use_serno, backend_str, 0, NUM_CLAIM_ATTEMPTS, &conn);
 
 	if (found == -1) {
 		ERROR("Printer open failure (No matching printers found!)\n");
+		STATE("+offline-report\n");
 		ret = CUPS_BACKEND_RETRY;
 		goto done;
 	}
+	STATE("-offline-report\n");
 
 	if (test_mode) {
 		WARNING("**** TEST MODE %d!\n", test_mode);
@@ -1157,7 +1484,7 @@ int main (int argc, char **argv)
 	}
 
 	/* Open an appropriate device */
-	ret = libusb_open(list[found], &dev);
+	ret = libusb_open(list[found], &conn.dev);
 	if (ret) {
 		ERROR("Printer open failure (Need to be root?) (%d)\n", ret);
 		ret = CUPS_BACKEND_RETRY_CURRENT;
@@ -1165,9 +1492,9 @@ int main (int argc, char **argv)
 	}
 
 	/* Detach the kernel driver */
-	if (libusb_kernel_driver_active(dev, iface)) {
-		ret = libusb_detach_kernel_driver(dev, iface);
-		if (ret) {
+	if (libusb_kernel_driver_active(conn.dev, conn.iface)) {
+		ret = libusb_detach_kernel_driver(conn.dev, conn.iface);
+		if (ret && (ret != LIBUSB_ERROR_NOT_SUPPORTED)) {
 			ERROR("Printer open failure (Could not detach printer from kernel) (%d)\n", ret);
 			ret = CUPS_BACKEND_RETRY_CURRENT;
 			goto done_close;
@@ -1175,7 +1502,7 @@ int main (int argc, char **argv)
 	}
 
 	/* Claim the interface so we can start using this! */
-	ret = backend_claim_interface(dev, iface, NUM_CLAIM_ATTEMPTS);
+	ret = backend_claim_interface(conn.dev, conn.iface, NUM_CLAIM_ATTEMPTS);
 	if (ret) {
 		ERROR("Printer open failure (Unable to claim interface) (%d)\n", ret);
 		ret = CUPS_BACKEND_RETRY;
@@ -1183,16 +1510,18 @@ int main (int argc, char **argv)
 	}
 
 	/* Use the appropriate altesetting! */
-	if (altset != 0) {
-		ret = libusb_set_interface_alt_setting(dev, iface, altset);
+	if (conn.altset != 0) {
+		ret = libusb_set_interface_alt_setting(conn.dev, conn.iface, conn.altset);
 		if (ret) {
 			ERROR("Printer open failure (Unable to issue altsettinginterface) (%d)\n", ret);
 			ret = CUPS_BACKEND_RETRY;
-			goto done_close;
+			goto done_claimed;
 		}
 	}
 
 bypass:
+	STATE("-connecting-to-device\n");
+
 	/* Initialize backend */
 	DEBUG("Initializing '%s' backend (version %s)\n",
 	      backend->name, backend->version);
@@ -1202,180 +1531,95 @@ bypass:
 		struct libusb_device *device;
 		struct libusb_device_descriptor desc;
 
-		device = libusb_get_device(dev);
+		device = libusb_get_device(conn.dev);
 		libusb_get_device_descriptor(device, &desc);
 
-		printer_type = lookup_printer_type(backend,
-						   desc.idVendor, desc.idProduct);
+		conn.type = lookup_printer_type(backend,
+						desc.idVendor, desc.idProduct);
+		conn.usb_vid = desc.idVendor;
+		conn.usb_pid = desc.idProduct;
 	} else {
-		printer_type = lookup_printer_type(backend,
-						   extra_vid, extra_pid);
+		conn.type = lookup_printer_type(backend,
+						extra_vid, extra_pid);
+		conn.usb_vid = extra_vid;
+		conn.usb_pid = extra_pid;
 	}
 
-	if (printer_type <= P_UNKNOWN) {
+	if (conn.type <= P_UNKNOWN) {
 		ERROR("Unable to lookup printer type\n");
 		ret = CUPS_BACKEND_FAILED;
-		goto done_close;
+		goto done_claimed;
 	}
 
-	/* Attach backend to device */
-	if (backend->attach(backend_ctx, dev, printer_type, endp_up, endp_down, jobid)) {
-		ERROR("Unable to attach to printer!");
+	/* Attach backend to device */ // XXX pass backend_str?
+	ret = backend->attach(backend_ctx, &conn, jobid);
+	if (ret) {
+		ERROR("Unable to attach to printer!\n");
 		ret = CUPS_BACKEND_FAILED;
-		goto done_close;
+		goto done_claimed;
 	}
 
-//	STATE("+org.gutenprint-attached-to-device\n");
+	/* Dump stats only */
+	if (stats_only && backend->query_stats) {
+		struct printerstats stats;
+		memset(&stats, 0, sizeof(stats));
 
-	if (!uri) {
-		if (backend->cmdline_arg(backend_ctx, argc, argv) < 0)
+		stats.timestamp = time(NULL);
+		ret = backend->query_stats(backend_ctx, &stats);
+		if (ret)
+			goto done_claimed;
+		dump_stats(backend, &stats, stats_only -1);
+		for (int i = 0 ; i < stats.decks ; i++) {
+			if (stats.status[i])
+				free(stats.status[i]); // the only dynamic member..
+		}
+		goto done_claimed;
+	}
+
+	PPD("StpUsbBackend=\"%s\"\n", backend_str ? backend_str : backend->name);
+	PPD("StpUsbVid=%04x\n", conn.usb_vid);
+	PPD("StpUsbPid=%04x\n", conn.usb_pid);
+	PPD("StpUsbBus=%03d\n", conn.bus_num);
+	PPD("StpUsbPort=%03d\n", conn.port_num);
+
+	if (!uri || !strlen(uri)) {
+		if (backend->cmdline_arg(backend_ctx, argc, argv))
 			goto done_claimed;
 
 		/* Grab the filename */
 		fname = argv[optind]; // XXX do this a smarter way?
 	}
 
-	if (!fname) {
-		if (uri)
-			ERROR("ERROR: No input file specified\n");
-		goto done_claimed;
-	}
-
-	if (ncopies < 1) {
-		ERROR("ERROR: need to have at least 1 copy!\n");
-		ret = CUPS_BACKEND_FAILED;
-		goto done_claimed;
-	}
-
-	/* Open file if not STDIN */
-	if (strcmp("-", fname)) {
-		data_fd = open(fname, O_RDONLY);
-		if (data_fd < 0) {
-			perror("ERROR:Can't open input file");
-			ret = CUPS_BACKEND_FAILED;
-			goto done_claimed;
-		}
-	}
-
-	/* Ensure we're using BLOCKING I/O */
-	i = fcntl(data_fd, F_GETFL, 0);
-	if (i < 0) {
-		perror("ERROR:Can't open input");
-		ret = CUPS_BACKEND_FAILED;
-		goto done;
-	}
-	i &= ~O_NONBLOCK;
-	i = fcntl(data_fd, F_SETFL, i);
-	if (i < 0) {
-		perror("ERROR:Can't open input");
-		ret = CUPS_BACKEND_FAILED;
-		goto done_claimed;
-	}
-
-	/* Ignore SIGPIPE */
-	signal(SIGPIPE, SIG_IGN);
-	signal(SIGTERM, sigterm_handler);
-
-	/* Time for the main processing loop */
-	INFO("Printing started (%d copies)\n", ncopies);
-
-	/* See if it's a CUPS command stream, and if yes, handle it! */
-	if (type && !strcmp("application/vnd.cups-command", type))
-	{
-		ret = parse_cmdstream(backend, backend_ctx, data_fd);
-		goto done_claimed;
-	}
-
-newpage:
-
-	/* Read in data */
-	if ((ret = backend->read_parse(backend_ctx, &job, data_fd, ncopies))) {
-		if (current_page)
-			goto done_multiple;
-		else
-			goto done_claimed;
-	}
-
-	/* The backend parser might not return a job due to job dependencies.
-	   Try and read another page. */
-	if (!job)
-		goto newpage;
-
-	/* Create our own joblist if necessary */
-	if (!(backend->flags & BACKEND_FLAG_JOBLIST)) {
-		struct dyesub_joblist *jlist = dyesub_joblist_create(backend, backend_ctx);
-		if (!list)
-			goto done_claimed;
-		dyesub_joblist_addjob(jlist, job);
-		job = jlist;
-	}
-
-	/* Dump the full marker dump */
-	ret = query_markers(backend, backend_ctx, !current_page);
-	if (ret)
-		goto done_claimed;
-
-	INFO("Printing page %d\n", ++current_page);
-
-	if (test_mode >= TEST_MODE_NOPRINT ) {
-		WARNING("**** TEST MODE, bypassing printing!\n");
-	} else {
-		ret = dyesub_joblist_print(job);
-	}
-
-	dyesub_joblist_cleanup(job);
-
-	if (ret)
-		goto done_claimed;
-
-	/* Log the completed page */
-	if (!uri)
-		PAGE("%d %d\n", current_page, ncopies);
-
-	/* Dump a marker status update */
-	ret = query_markers(backend, backend_ctx, !current_page);
-	if (ret)
-		goto done_claimed;
-
-	/* Since we have no way of telling if there's more data remaining
-	   to be read (without actually trying to read it), always assume
-	   multiple print jobs. */
-	goto newpage;
-
-done_multiple:
-	close(data_fd);
-
-	/* Done printing, log the total number of pages */
-	if (!uri)
-		PAGE("total %d\n", current_page * ncopies);
-	ret = CUPS_BACKEND_OK;
+	/* Parse the file passed in */
+	ret = handle_input(backend, backend_ctx, fname, uri, type);
 
 done_claimed:
 	if (test_mode < TEST_MODE_NOATTACH)
-		libusb_release_interface(dev, iface);
+		libusb_release_interface(conn.dev, conn.iface);
 
 done_close:
 	if (test_mode < TEST_MODE_NOATTACH)
-		libusb_close(dev);
+		libusb_close(conn.dev);
 done:
+
+	STATE("-connecting-to-device\n");
 
 	if (backend && backend_ctx) {
 		if (backend->teardown)
 			backend->teardown(backend_ctx);
 		else
 			generic_teardown(backend_ctx);
-//		STATE("-org.gutenprint-attached-to-device");
 	}
 
 	if (list)
 		libusb_free_device_list(list, 1);
 
-	libusb_exit(ctx);
+	libusb_exit(NULL);
 
 	return ret;
 }
 
-void dump_markers(struct marker *markers, int marker_count, int full)
+void dump_markers(const struct marker *markers, int marker_count, int full)
 {
 	int i;
 
@@ -1427,7 +1671,7 @@ minimal:
 	for (i = 0 ; i < marker_count; i++) {
 		int val;
 		if (markers[i].levelmax <= 0 || markers[i].levelnow < 0)
-			val = (markers[i].levelnow <= 0) ? markers[i].levelnow : -1;
+			val = (markers[i].levelnow <= 0) ? markers[i].levelnow : CUPS_MARKER_UNAVAILABLE;
 		else if (markers[i].levelmax == 100)
 			val = markers[i].levelnow;
 		else
@@ -1443,13 +1687,13 @@ minimal:
 		ATTR("marker-message=");
 		for (i = 0 ; i < marker_count; i++) {
 			switch (markers[i].levelnow) {
-			case -1:
+			case CUPS_MARKER_UNAVAILABLE:
 				DEBUG2("'\"Unable to query remaining prints on %s media\"'", markers[i].name);
 				break;
-			case -2:
+			case CUPS_MARKER_UNKNOWN:
 				DEBUG2("'\"Unknown remaining prints on %s media\"'", markers[i].name);
 				break;
-			case -3:
+			case CUPS_MARKER_UNKNOWN_OK:
 				DEBUG2("'\"One or more remaining prints on %s media\"'", markers[i].name);
 				break;
 			default:
@@ -1461,9 +1705,22 @@ minimal:
 		}
 		DEBUG2("\n");
 	}
+
+	if (markers[0].levelnow == 0)
+		STATE("+media-empty\n");
+	else if (markers[0].levelnow > 0 || markers[0].levelnow == CUPS_MARKER_UNKNOWN_OK)
+		STATE("-media-empty\n");
+
+	/* If we're running as a CUPS backend, report the media type */
+	if (full && getenv("DEVICE_URI")) {
+		for (i = 0 ; i < marker_count ; i++) {
+			PPD("StpMediaID%d=%d\n", i, markers[i].numtype);
+			PPD("StpMediaName%d=\"%s\"\n", i, markers[i].name);
+		}
+	}
 }
 
-int dyesub_read_file(char *filename, void *databuf, int datalen,
+int dyesub_read_file(const char *filename, void *databuf, int datalen,
 		     int *actual_len)
 {
 	int len;
@@ -1513,13 +1770,13 @@ uint16_t uint16_to_packed_bcd(uint16_t val)
         return bcd;
 }
 
-uint32_t packed_bcd_to_uint32(char *in, int len)
+uint32_t packed_bcd_to_uint32(const char *in, int len)
 {
 	uint32_t out = 0;
 
 	while (len--) {
 		out *= 10;
-		out += (*in >> 4);
+		out += ((*in >> 4) & 0xf);
 		out *= 10;
 		out += (*in & 0xf);
 		in++;
@@ -1528,7 +1785,7 @@ uint32_t packed_bcd_to_uint32(char *in, int len)
 }
 
 /* Job list manipulation */
-struct dyesub_joblist *dyesub_joblist_create(struct dyesub_backend *backend, void *ctx)
+struct dyesub_joblist *dyesub_joblist_create(const struct dyesub_backend *backend, void *ctx)
 {
 	struct dyesub_joblist *list;
 
@@ -1559,27 +1816,213 @@ void dyesub_joblist_cleanup(const struct dyesub_joblist *list)
 	free((void*)list);
 }
 
-int dyesub_joblist_addjob(struct dyesub_joblist *list, const void *job)
+static int __dyesub_joblist_addjob(struct dyesub_joblist *list, const void *job)
 {
 	if (list->num_entries >= DYESUB_MAX_JOB_ENTRIES)
 		return 1;
 
 	list->entries[list->num_entries++] = job;
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
-int dyesub_joblist_print(const struct dyesub_joblist *list)
+static int __dyesub_append_job(struct dyesub_joblist *list, const void **vjob, int polarity)
+{
+	struct dyesub_job_common *job, *combined;
+	const struct dyesub_job_common *oldjob;
+
+	/* Create writable copy of the new job */
+	job = malloc(((const struct dyesub_job_common *)*vjob)->jobsize);
+	if (!job) {
+		ERROR("Memory allocation failure!\n");
+		return CUPS_BACKEND_RETRY_CURRENT;
+	}
+	memcpy(job, *vjob, ((const struct dyesub_job_common *)*vjob)->jobsize);
+
+	/* If we can't combine the new job, don't bother doing anything else */
+	if (!job->can_combine) {
+		free(job);
+		return CUPS_BACKEND_OK;
+	}
+
+	/* Get the old job */
+	oldjob = dyesub_joblist_popjob(list);
+
+	/* If we can't combine with it, carry on as before */
+	if (oldjob && (oldjob->copies > 1 || !oldjob->can_combine)) {
+		__dyesub_joblist_addjob(list, oldjob);
+		oldjob = NULL;
+	}
+
+	if (oldjob) {
+		/* Try to combine first copy with old job */
+		combined = list->backend->combine_jobs(oldjob, job);
+		if (combined) {
+			INFO("Successfully combined two jobs\n");
+			/* Success, add it to the list */
+	                __dyesub_joblist_addjob(list, combined);
+			combined = NULL;
+
+			/* Clean up the old job */
+			list->backend->cleanup_job(oldjob);
+
+			/* Anything left in the new job? */
+			job->copies--;
+			if (job->copies == 0) {
+				/* Nope, we're done */
+				list->backend->cleanup_job(job);
+			} else if (job->copies == 1) {
+				/* Just one, shove it on the list */
+				__dyesub_joblist_addjob(list, job);
+			}
+
+			goto done;
+		} else {
+			/* Failed to combine, restore old job and continue */
+			__dyesub_joblist_addjob(list, oldjob);
+		}
+
+		polarity = 0;
+	}
+
+	/* If we have no work to do, just return */
+	if (job->copies == 1) {
+		free(job);
+		return CUPS_BACKEND_OK;
+	}
+
+	/* Attempt to combine multiple copies! */
+	combined = list->backend->combine_jobs(job, job);
+
+	if (!combined) {
+		/* Failed, so return */
+		free(job);
+		return CUPS_BACKEND_OK;
+	}
+
+	INFO("Successfully combined multiple copies\n");
+	combined->copies = job->copies / 2;
+	job->copies = job->copies % 2;
+
+	/* Add the combined job at start if we can */
+	if (!polarity) {
+		__dyesub_joblist_addjob(list, combined);
+	}
+
+	/* Add the remainder, if any */
+	if (job->copies) {
+		__dyesub_joblist_addjob(list, job);
+	} else {
+		list->backend->cleanup_job(job);
+	}
+
+	/* Add combined job at end of we need to */
+	if (polarity) {
+		__dyesub_joblist_addjob(list, combined);
+	}
+
+done:
+	/* Clean up */
+	free((void*)*vjob);
+	*vjob = NULL;
+
+	return CUPS_BACKEND_OK;
+}
+
+int dyesub_joblist_appendjob(struct dyesub_joblist *list, const void *job)
+{
+	if (list->backend->combine_jobs) {
+		int polarity = 0;
+		if (list->backend->job_polarity)
+			polarity = list->backend->job_polarity(list->ctx);
+		__dyesub_append_job(list, &job, polarity);
+	}
+
+	if (job)
+		__dyesub_joblist_addjob(list, job);
+
+	return CUPS_BACKEND_OK;
+}
+
+const void *dyesub_joblist_popjob(struct dyesub_joblist *list)
+{
+	if (list->num_entries) {
+		return list->entries[--list->num_entries];
+	}
+
+	return NULL;
+}
+
+int dyesub_pano_split_rgb8(const uint8_t *src, uint16_t cols,
+			   uint16_t src_rows, uint8_t numpanels,
+			   uint16_t overlap_rows, uint16_t max_rows,
+			   uint8_t *panels[3],
+			   uint16_t panel_rows[3])
+{
+	/* Do nothing if there's no point */
+	if (numpanels < 2 || src_rows <= max_rows)
+		return CUPS_BACKEND_OK;
+
+	/* Work out panel sizes if not specified */
+	if (panel_rows[0] == 0) {
+		panel_rows[0] = max_rows;
+		panel_rows[1] = src_rows - panel_rows[0] + overlap_rows;
+		if (numpanels > 2)
+			panel_rows[2] = src_rows - panel_rows[0] - panel_rows[1] + overlap_rows*2;
+	}
+
+	/* Copy panel data */
+	memcpy(panels[0], src, cols * panel_rows[0] * 3);
+	memcpy(panels[1], src + (panel_rows[0] - overlap_rows) * 3, cols * panel_rows[1] * 3);
+	if (numpanels > 2)
+		memcpy(panels[2], src + (panel_rows[0] - overlap_rows + panel_rows[1] - overlap_rows) * 3, cols * panel_rows[2] * 3);
+
+	return CUPS_BACKEND_OK;
+}
+
+int dyesub_joblist_canwait(struct dyesub_joblist *list)
+{
+	if (list->num_entries == DYESUB_MAX_JOB_ENTRIES)
+		return 0;
+	if (!list->num_entries)
+		return 1;
+
+	return ((const struct dyesub_job_common *)(list->entries[list->num_entries - 1]))->can_combine;
+}
+
+int dyesub_joblist_print(const struct dyesub_joblist *list, int *pagenum)
 {
 	int i, j;
 	int ret;
+//	int pages = 0;
+
 	for (i = 0 ; i < list->copies ; i++) {
 		for (j = 0 ; j < list->num_entries ; j++) {
+			int wait_on_return = 0;
+			if (i == (list->copies - 1) && j == (list->num_entries -1))
+				wait_on_return = !fast_return; /* only wait on the final copy/page. */
+
 			if (list->entries[j]) {
-				ret = list->backend->main_loop(list->ctx, list->entries[j]);
+				int copies = ((const struct dyesub_job_common *)(list->entries[j]))->copies;
+
+				INFO("Printing page %d (%d copies)\n", ++(*pagenum), copies);
+				if (test_mode >= TEST_MODE_NOPRINT )
+					WARNING("**** TEST MODE, bypassing printing!\n");
+
+				/* Print this page */
+				if (test_mode < TEST_MODE_NOPRINT ||
+				    list->backend->flags & BACKEND_FLAG_DUMMYPRINT) {
+					ret = list->backend->main_loop(list->ctx, list->entries[j], wait_on_return);
+					if (ret)
+						return ret;
+				}
+
+//				pages += copies;
+
+				/* Dump a marker status update */
+				ret = query_markers(list->backend, list->ctx, 0);
 				if (ret)
 					return ret;
-
 #if 0
 				/* Free up the job as we go along
 				   if we're on the final copy */
@@ -1591,5 +2034,8 @@ int dyesub_joblist_print(const struct dyesub_joblist *list)
 			}
 		}
 	}
+
+//	INFO("Printed %d total pages/copies\n", pages);
+
 	return CUPS_BACKEND_OK;
 }

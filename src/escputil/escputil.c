@@ -810,7 +810,8 @@ set_printer_model(void)
 	      (!strncmp(short_name, "escp2-", strlen("escp2-")) &&
 	       !strcasecmp(printer_model, short_name + strlen("escp2-"))) ||
 	      (!strncasecmp(long_name, "Epson ", strlen("Epson ")) &&
-	       !strcasecmp(printer_model, long_name + strlen("Epson "))))
+	       !strcasecmp(printer_model, long_name + strlen("Epson "))) ||	              (!strncasecmp(long_name, "Fujifilm ", strlen("Fujifilm ")) &&
+	       !strcasecmp(printer_model, long_name + strlen("Fujifilm "))))
 	    {
 	      const stp_vars_t *printvars;
 	      stp_parameter_t desc;
@@ -1131,8 +1132,20 @@ print_status(int param)
     case 8:
       printf(_("Status: Factory shipment\n"));
       break;
+    case 9:
+      printf(_("Status: Sleeping\n")); /* Lower power mode */
+      break;
     case 0xa:
       printf(_("Status: Shutting down\n"));
+      break;
+    case 0xc:
+      printf(_("Status: Initializing paper\n"));
+      break;
+    case 0xd:
+      printf(_("Status: Black ink switching\n"));
+      break;
+    case 0xf:
+      printf(_("Status: Initializing ink\n"));
       break;
     default:
       printf(_("Status: Unknown (%d)\n"), param);
@@ -1163,6 +1176,9 @@ print_error(int param)
     case 6:
       printf(_("Error: Paper out\n"));
       break;
+    case 0xb:
+      printf(_("Error: Double feed\n"));
+      break;
     case 0xc:
       printf(_("Error: Miscellaneous paper error\n"));
       break;
@@ -1174,6 +1190,9 @@ print_error(int param)
       break;
     case 0x12:
       printf(_("Error: Double feed error\n"));
+      break;
+    case 0x16:
+      printf(_("Error: Cleaning impossible\n"));
       break;
     case 0x1a:
       printf(_("Error: Ink cartridge lever released\n\n"));
@@ -1199,11 +1218,20 @@ print_error(int param)
     case 0x2b:
       printf(_("Error: Tray cover open\n"));
       break;
+    case 0x2d:
+      printf(_("Error: No maintenance box\n"));
+      break;
+    case 0x2e:
+      printf(_("Error: Maintenance box overflow\n"));
+      break;
     case 0x36:
       printf(_("Error: Maintenance cartridge cover open\n"));
       break;
     case 0x37:
       printf(_("Error: Front cover open\n"));
+      break;
+    case 0x40:
+      printf(_("Error: Strip bin missing\n"));
       break;
     case 0x41:
       printf(_("Error: Maintenance request\n"));
@@ -1380,6 +1408,7 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
   const char *ind;
   const stp_string_list_t *color_list = NULL;
   stp_parameter_t desc;
+  unsigned maint_level = 0xff;
 
   const stp_vars_t *printvars = NULL;
   if (printer)
@@ -1405,7 +1434,7 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
 	  ind = buf + i + 3;
 	  if (cmd == CMD_STATUS)
 	    printf(_("Ink Levels:\n"));
-	  printf("%20s    %20s\n", _("Ink color"), _("Percent remaining"));
+	  printf("%25s    %20s\n", _("Ink color"), _("Percent remaining"));
 	  for (j = 0; j < count; j++)
 	    {
 	      STP_DEBUG(printf("***    Ink %d: ind[0] %d ind[1] %d ind[2] %d interchangeable %d param %d count %d aux %d\n",
@@ -1416,13 +1445,13 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
 		   ! aux_colors[(int) ind[1]]) */)
 		{
 		  STP_DEBUG(printf("***Case 0\n"));
-		  printf("%20s    %20d\n",
+		  printf("%25s    %20d\n",
 			 gettext(colors_new[(int) ind[0]]), ind[2]);
 		}
 	      else if (ind[1] < aux_color_count && aux_colors[(int) ind[1]])
 		{
 		  STP_DEBUG(printf("***Case 1\n"));
-		  printf("%20s    %20d\n",
+		  printf("%25s    %20d\n",
 			 gettext(aux_colors[(int) ind[1]]), ind[2]);
 		}
 	      else
@@ -1434,9 +1463,15 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
 		}
 	      ind += param;
 	    }
+          if (maint_level != 0xff)
+            printf("\n%25s    %20d\n", _("Maintenance Cartridge"), maint_level);
 	  if (cmd == CMD_STATUS)
 	    printf("\n");
 	}
+      else if (hdr == 0x0d) /* Always report Maintenance cartridge level */
+        {
+          maint_level = buf[i + 2]; /* Stash and print out as part of ink level */
+        }
       else if (cmd == CMD_STATUS)
 	{
 	  switch (hdr)
@@ -1466,6 +1501,33 @@ do_new_status(status_cmd_t cmd, char *buf, int bytes,
 		  putchar('\n');
 		}
 	      break;
+	    case 0x1f:	/* Serial number */
+	      printf(_("Serial Number: "));
+	      for (j = 0; j < total_param_count; j++)
+		 putchar(buf[i + j + 2]);
+	      putchar('\n');
+	      break;
+	    case 0x21: /* Paper remaining, in centimeters */
+              param = buf[i + 3] + (buf[i + 4] << 8);
+	      printf(_("Paper Remaining:"));
+	      printf(" %d feet / %d cm", (int)(((double)param+15.24) / 30.48f), param);
+	      putchar('\n');
+	      break;
+	    case 0x2c: /* Paper width, in units of 360 dpi */
+	      param = buf[i + 2] + (buf[i + 3] << 8);
+              printf(_("Paper Width: "));
+              if (param > 2880)
+                printf("A4 / 210mm");
+              else if (param > 2160)
+                printf("8 inch / 203 mm");
+              else if (param > 1800)
+                printf("6 inch / 152 mm");
+              else if (param > 1440)
+                printf("5 inch / 127 mm");
+              else
+                printf("4 inch / 102 mm");
+	      putchar('\n');
+              break;
 	    default:
 	      /* Ignore other commands */
 	      break;
@@ -1613,12 +1675,14 @@ get_ink_channel_list(const stp_printer_t *printer, int fd)
       buf[status] = '\0';
       if ( buf[7] == '2' )
 	{
+	  int param;
 	  STP_DEBUG(printf("***New format ink!\n"));
 	  /* new binary format ! */
 	  i = 10;
 	  while (buf[i] != 0x0f && i < status)
 	    i += buf[i + 1] + 2;
 	  ind = buf + i;
+	  param = buf[i + 2];
 	  i = 3;
 	  while (i < ind[1])
 	    {
@@ -1644,7 +1708,7 @@ get_ink_channel_list(const stp_printer_t *printer, int fd)
 		  stp_string_list_add_string_unsafe(color_list, "Unknown",
 						    "Unknown");
 		}
-	      i+=3;
+	      i+=param;
 	    }
 	}
       STP_DEBUG(printf("***Using color list from status message\n"));
@@ -1680,7 +1744,9 @@ do_extended_ink_info_1(const stp_printer_t *printer)
 	  CloseChannel(fd, socket_id);
 	  exit(1);
 	}
-      ind = strchr(buf, 'I');
+      ind = strchr(buf, 'i');
+      if (!ind)
+        ind = strchr(buf, 'I');
       if (!ind)
 	{
 	  STP_DEBUG(printf("***Case 0: failure %i (%s)\n", i, buf));
@@ -1793,6 +1859,9 @@ do_extended_ink_info_1(const stp_printer_t *printer)
 	}
       else if (sscanf(ind,
 		      "II:%*2s;IQT:%x;PDY:%x;PDM:%x;STY:%*2s;STM:%*2s;STD:%*2s;EDY:%*2s;EDM:%*2s;EDD:%*2s;IC1:%x;IC2:%*4s;IK:%*4s;TOV:%*x;TVU:%*x;VIQ:%*4x;UIQ:%*4x;ERC:%*x;SID:%*x;LOG:EPSON   ;",
+		      &val, &year, &month, &id ) == 4 ||
+	       sscanf(ind,
+		      "ii:%*2s;IQT:%x;PDY:%x;PDM:%x;STY:%*2s;STM:%*2s;STD:%*2s;EDY:%*2s;EDM:%*2s;EDD:%*2s;IC1:%x;IC2:%*4s;IK:%*4s;TOV:%*x;TOU:%*x;TVU:%*x;VIQ:%*4x;UIQ:%*4x;ERC:%*x;SID:%*x;LOG:EPSON   ;",
 		      &val, &year, &month, &id ) == 4)
 	{
 	  STP_DEBUG(printf("***Case 5: i %i val %ud year %ud mo %ud id %ud\n",

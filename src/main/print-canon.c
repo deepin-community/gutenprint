@@ -548,6 +548,7 @@ static const char* canon_families[] = {
  "PIXMA TS",  /* 18 */
  "PIXMA TR",  /* 19 */
  "PIXMA XK",  /* 20 */
+ "PIXMA GM",  /* 21 */
 };
 
 /* canon model ids look like the following
@@ -662,7 +663,7 @@ static const canon_mode_t* canon_get_current_mode(const stp_vars_t *v){
     }
 #endif
 
-    stp_dprintf(STP_DBG_CANON, v,"DEBUG: Gutenprint: current mode is '%s'\n",resolution);
+    stp_dprintf(STP_DBG_CANON, v,"DEBUG: Gutenprint: current mode is '%s'\n",resolution ? resolution : "(null)");
 
     return mode;
 }

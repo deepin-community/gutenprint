@@ -346,6 +346,18 @@ static const stp_parameter_t the_parameters[] =
     STP_PARAMETER_LEVEL_INTERNAL, 0, 0, STP_CHANNEL_NONE, 0, 0
   },
   {
+    "CommandFilterName", N_("Command filter name"), "Color=No,Category=Job Mode",
+    N_("Command filter name"),
+    STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
+    STP_PARAMETER_LEVEL_INTERNAL, 1, 0, STP_CHANNEL_NONE, 0, 1
+  },
+  {
+    "CommandFilterCommands", N_("Filter commands supported"), "Color=No,Category=Job Mode",
+    N_("Filter commands supported"),
+    STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
+    STP_PARAMETER_LEVEL_INTERNAL, 1, 0, STP_CHANNEL_NONE, 0, 1
+  },
+  {
     "ChannelNames", N_("Channel Names"), "Color=No,Category=Advanced Printer Functionality",
     N_("Channel Names"),
     STP_PARAMETER_TYPE_STRING_LIST, STP_PARAMETER_CLASS_FEATURE,
@@ -422,6 +434,7 @@ static const stp_parameter_t the_parameters[] =
   PARAMETER_INT(black_nozzle_separation),
   PARAMETER_INT(fast_nozzle_separation),
   PARAMETER_INT(separation_rows),
+  PARAMETER_INT(roll_lb),
   PARAMETER_DIMENSION(max_paper_width),
   PARAMETER_DIMENSION(max_paper_height),
   PARAMETER_DIMENSION(min_paper_width),
@@ -434,6 +447,7 @@ static const stp_parameter_t the_parameters[] =
   PARAMETER_INT(resolution_scale),
   PARAMETER_INT(initial_vertical_offset),
   PARAMETER_INT(black_initial_vertical_offset),
+  PARAMETER_INT(printing_initial_vertical_offset),
   PARAMETER_INT(max_black_resolution),
   PARAMETER_INT(zero_margin_offset),
   PARAMETER_INT(extra_720dpi_separation),
@@ -1029,7 +1043,7 @@ sizeof(int_parameters) / sizeof(const int_param_t);
 
 
 static escp2_privdata_t *
-get_privdata(stp_vars_t *v)
+get_privdata(const stp_vars_t *v)
 {
   return (escp2_privdata_t *) stp_get_component_data(v, "Driver");
 }
@@ -1124,6 +1138,7 @@ DEF_SIMPLE_ACCESSOR(base_separation, int)
 DEF_SIMPLE_ACCESSOR(resolution_scale, int)
 DEF_SIMPLE_ACCESSOR(initial_vertical_offset, int)
 DEF_SIMPLE_ACCESSOR(black_initial_vertical_offset, int)
+DEF_SIMPLE_ACCESSOR(printing_initial_vertical_offset, int)
 DEF_SIMPLE_ACCESSOR(max_black_resolution, int)
 DEF_SIMPLE_ACCESSOR(zero_margin_offset, int)
 DEF_SIMPLE_ACCESSOR(extra_720dpi_separation, int)
@@ -2816,6 +2831,27 @@ escp2_parameters(const stp_vars_t *v, const char *name,
 	    stp_string_list_param(description->bounds.str, 0)->name;
 	}
     }
+  else if (strcmp(name, "CommandFilterName") == 0)
+    {
+      description->bounds.str = stp_string_list_create();
+      stp_string_list_add_string(description->bounds.str,
+		   "commandtoepson", _("commandtoepson"));
+      description->is_active = 1;
+    }
+  else if (strcmp(name, "CommandFilterCommands") == 0)
+    {
+      description->bounds.str = stp_string_list_create();
+      stp_string_list_add_string(description->bounds.str,
+				   "Clean", _("Clean"));
+      stp_string_list_add_string(description->bounds.str,
+				   "PrintSelfTestPage", _("Print self-test page"));
+      /* Not yet */
+//      stp_string_list_add_string(description->bounds.str,
+//				   "ReportLevels", _("Report levels"));
+//      stp_string_list_add_string(description->bounds.str,
+//				   "AutoConfigure", _("Auto Configure"));
+      description->is_active = 1;
+    }
   else if (strcmp(name, "MultiChannelLimit") == 0)
     {
       description->is_active = 0;
@@ -3746,6 +3782,7 @@ setup_basic(stp_vars_t *v)
   pd->command_set = stpi_escp2_get_cap(v, MODEL_COMMAND);
   pd->variable_dots = stpi_escp2_has_cap(v, MODEL_VARIABLE_DOT, MODEL_VARIABLE_YES);
   pd->has_graymode = stpi_escp2_has_cap(v, MODEL_GRAYMODE, MODEL_GRAYMODE_YES);
+  pd->roll_only = stpi_escp2_has_cap(v, MODEL_ROLL_ONLY, MODEL_ROLL_ONLY_YES);
   pd->preinit_sequence = escp2_preinit_sequence(v);
   pd->preinit_remote_sequence = escp2_preinit_remote_sequence(v);
   pd->deinit_remote_sequence = escp2_postinit_remote_sequence(v);
@@ -3885,9 +3922,13 @@ lcm(unsigned a, unsigned b)
 static int
 adjusted_vertical_resolution(const stp_vars_t *v, const res_t *res)
 {
+  escp2_privdata_t *pd = get_privdata(v);
+
   if (res->vres >= escp2_base_separation(v) * 2)
     return res->vres;
-  else if (res->hres >= escp2_base_separation(v) * 2)	/* Special case 720x360 */
+  else if (!pd->roll_only && res->hres >= escp2_base_separation(v) * 2)	/* Special case 720x360 */
+    /* Note that we want to bypass this for the roll_only models like the D700. This needs
+       to be revisited as it's likely applicable for many more models! */
     return escp2_base_separation(v) * 2;
   else if (res->vres % 90 == 0)
     return res->vres;
@@ -4091,7 +4132,9 @@ setup_head_parameters(stp_vars_t *v)
       pd->page_management_units /
       escp2_base_separation(v);
 
-  pd->printing_initial_vertical_offset = 0;
+  pd->printing_initial_vertical_offset = escp2_printing_initial_vertical_offset(v) *
+      pd->page_management_units / escp2_base_separation(v);
+
   pd->bitwidth = escp2_bits(v);
 }
 

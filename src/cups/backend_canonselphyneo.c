@@ -1,11 +1,11 @@
 /*
  *   Canon SELPHY CPneo series CUPS backend -- libusb-1.0 version
  *
- *   (c) 2016-2018 Solomon Peachy <pizza@shaftnet.org>
+ *   (c) 2016-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -18,35 +18,15 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
-
 #define BACKEND canonselphyneo_backend
 
 #include "backend_common.h"
-
-/* Exported */
-#define USB_VID_CANON        0x04a9
-#define USB_PID_CANON_CP820  0x327b
-#define USB_PID_CANON_CP910  0x327a
-#define USB_PID_CANON_CP1000 0x32ae
-#define USB_PID_CANON_CP1200 0x32b1
-#define USB_PID_CANON_CP1300 0x32db
 
 /* Header data structure */
 struct selphyneo_hdr {
@@ -62,22 +42,19 @@ struct selphyneo_readback {
 
 /* Private data structure */
 struct selphyneo_printjob {
+	struct dyesub_job_common common;
+
 	uint8_t *databuf;
 	uint32_t datalen;
-
-	int copies;
 };
 
 struct selphyneo_ctx {
-	struct libusb_device_handle *dev;
-	uint8_t endp_up;
-	uint8_t endp_down;
-	int type;
+	struct dyesub_connection *conn;
 
 	struct marker marker;
 };
 
-static char *selphyneo_statuses(uint8_t sts)
+static const char *selphyneo_statuses(uint8_t sts)
 {
 	switch(sts) {
 	case 0x01:
@@ -97,7 +74,7 @@ static char *selphyneo_statuses(uint8_t sts)
 	}
 }
 
-static char *selphyneo_errors(uint8_t err)
+static const char *selphyneo_errors(uint8_t err)
 {
 	switch(err) {
 	case 0x00:
@@ -123,7 +100,7 @@ static char *selphyneo_errors(uint8_t err)
 	}
 }
 
-static char *selphynew_pgcodes(uint8_t type) {
+static const char *selphynew_pgcodes(uint8_t type) {
 
 	switch (type & 0xf) {
 	case 0x01:
@@ -146,7 +123,7 @@ static int selphyneo_send_reset(struct selphyneo_ctx *ctx)
 			       0x00, 0x00, 0x00, 0x00 };
 	int ret;
 
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     rstcmd, sizeof(rstcmd))))
 		return CUPS_BACKEND_FAILED;
 
@@ -159,14 +136,14 @@ static int selphyneo_get_status(struct selphyneo_ctx *ctx)
 	int ret, num;
 
 	/* Read in the printer status to clear last state */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
 		return CUPS_BACKEND_FAILED;
 
 	/* And again, for the markers */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
@@ -193,10 +170,7 @@ static void *selphyneo_init(void)
 	return ctx;
 }
 
-extern struct dyesub_backend selphyneo_backend;
-
-static int selphyneo_attach(void *vctx, struct libusb_device_handle *dev, int type,
-			    uint8_t endp_up, uint8_t endp_down, uint8_t jobid)
+static int selphyneo_attach(void *vctx, struct dyesub_connection *conn, uint8_t jobid)
 {
 	struct selphyneo_ctx *ctx = vctx;
 	struct selphyneo_readback rdback;
@@ -204,21 +178,18 @@ static int selphyneo_attach(void *vctx, struct libusb_device_handle *dev, int ty
 
 	UNUSED(jobid);
 
-	ctx->dev = dev;
-	ctx->endp_up = endp_up;
-	ctx->endp_down = endp_down;
-	ctx->type = type;
+	ctx->conn = conn;
 
 	if (test_mode < TEST_MODE_NOATTACH) {
 		/* Read in the printer status to clear last state */
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				(uint8_t*) &rdback, sizeof(rdback), &num);
 
 		if (ret < 0)
 			return CUPS_BACKEND_FAILED;
 
 		/* And again, for the markers */
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				(uint8_t*) &rdback, sizeof(rdback), &num);
 
 		if (ret < 0)
@@ -232,11 +203,12 @@ static int selphyneo_attach(void *vctx, struct libusb_device_handle *dev, int ty
 
 	ctx->marker.color = "#00FFFF#FF00FF#FFFF00";
 	ctx->marker.name = selphynew_pgcodes(rdback.data[6]);
-	ctx->marker.levelmax = -1;
+	ctx->marker.numtype = rdback.data[6];
+	ctx->marker.levelmax = CUPS_MARKER_UNAVAILABLE;
 	if (rdback.data[2]) {
 		ctx->marker.levelnow = 0;
 	} else {
-		ctx->marker.levelnow = -3;
+		ctx->marker.levelnow = CUPS_MARKER_UNKNOWN_OK;
 	}
 
 	return CUPS_BACKEND_OK;
@@ -268,7 +240,8 @@ static int selphyneo_read_parse(void *vctx, const void **vjob, int data_fd, int 
 		return CUPS_BACKEND_RETRY_CURRENT;
 	}
 	memset(job, 0, sizeof(*job));
-	job->copies = copies;
+	job->common.jobsize = sizeof(*job);
+	job->common.copies = copies;
 
 	/* Read the header.. */
 	i = read(data_fd, &hdr, sizeof(hdr));
@@ -329,7 +302,7 @@ static int selphyneo_read_parse(void *vctx, const void **vjob, int data_fd, int 
 	return CUPS_BACKEND_OK;
 }
 
-static int selphyneo_main_loop(void *vctx, const void *vjob) {
+static int selphyneo_main_loop(void *vctx, const void *vjob, int wait_for_return) {
 	struct selphyneo_ctx *ctx = vctx;
 	struct selphyneo_readback rdback;
 
@@ -343,10 +316,10 @@ static int selphyneo_main_loop(void *vctx, const void *vjob) {
 	if (!job)
 		return CUPS_BACKEND_FAILED;
 
-	copies = job->copies;
+	copies = job->common.copies;
 
 	/* Read in the printer status to clear last state */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
@@ -356,7 +329,7 @@ top:
 	INFO("Waiting for printer idle\n");
 
 	do {
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				(uint8_t*) &rdback, sizeof(rdback), &num);
 
 		if (ret < 0)
@@ -393,7 +366,7 @@ top:
 		int chunk = 256*1024;
 		int sent = 0;
 		while (chunk > 0) {
-			if ((ret = send_data(ctx->dev, ctx->endp_down,
+			if ((ret = send_data(ctx->conn,
 					     job->databuf + sent, chunk)))
 				return CUPS_BACKEND_FAILED;
 			sent += chunk;
@@ -404,7 +377,7 @@ top:
 	}
 
 	/* Read in the printer status to clear last state */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
@@ -412,7 +385,7 @@ top:
 
 	INFO("Waiting for printer acknowledgement\n");
 	do {
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				(uint8_t*) &rdback, sizeof(rdback), &num);
 
 		if (ret < 0)
@@ -438,7 +411,7 @@ top:
 			return CUPS_BACKEND_STOP;
 		}
 
-		if (rdback.data[0] > 0x02 && fast_return && copies <= 1) {
+		if (rdback.data[0] > 0x02 && !wait_for_return && copies <= 1) {
 			INFO("Fast return mode enabled.\n");
 			break;
 		}
@@ -481,7 +454,7 @@ static int selphyneo_cmdline_arg(void *vctx, int argc, char **argv)
 		if (j) return j;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static void selphyneo_cmdline(void)
@@ -497,14 +470,14 @@ static int selphyneo_query_markers(void *vctx, struct marker **markers, int *cou
 	int ret, num;
 
 	/* Read in the printer status to clear last state */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
 		return CUPS_BACKEND_FAILED;
 
 	/* And again, for the markers */
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			(uint8_t*) &rdback, sizeof(rdback), &num);
 
 	if (ret < 0)
@@ -513,7 +486,7 @@ static int selphyneo_query_markers(void *vctx, struct marker **markers, int *cou
 	if (rdback.data[2])
 		ctx->marker.levelnow = 0;
 	else
-		ctx->marker.levelnow = -3;
+		ctx->marker.levelnow = CUPS_MARKER_UNKNOWN_OK;
 
 	*markers = &ctx->marker;
 	*count = 1;
@@ -523,15 +496,14 @@ static int selphyneo_query_markers(void *vctx, struct marker **markers, int *cou
 
 static const char *canonselphyneo_prefixes[] = {
 	"canonselphyneo", // Family name
-	"canon-cp820", "canon-cp910", "canon-cp1000", "canon-cp1200", "canon-cp1300",
 	// backwards compatibility
 	"selphycp820", "selphycp910", "selphycp1000", "selphycp1200", "selphycp1300",
 	NULL
 };
 
-struct dyesub_backend canonselphyneo_backend = {
+const struct dyesub_backend canonselphyneo_backend = {
 	.name = "Canon SELPHY CP (new)",
-	.version = "0.20",
+	.version = "0.22",
 	.uri_prefixes = canonselphyneo_prefixes,
 	.cmdline_usage = selphyneo_cmdline,
 	.cmdline_arg = selphyneo_cmdline_arg,
@@ -542,11 +514,11 @@ struct dyesub_backend canonselphyneo_backend = {
 	.main_loop = selphyneo_main_loop,
 	.query_markers = selphyneo_query_markers,
 	.devices = {
-		{ USB_VID_CANON, USB_PID_CANON_CP820, P_CP910, NULL, "canon-cp820"},
-		{ USB_VID_CANON, USB_PID_CANON_CP910, P_CP910, NULL, "canon-cp910"},
-		{ USB_VID_CANON, USB_PID_CANON_CP1000, P_CP910, NULL, "canon-cp1000"},
-		{ USB_VID_CANON, USB_PID_CANON_CP1200, P_CP910, NULL, "canon-cp1200"},
-		{ USB_VID_CANON, USB_PID_CANON_CP1300, P_CP910, NULL, "canon-cp1300"},
+		{ 0x04a9, 0x327b, P_CP910, NULL, "canon-cp820"},
+		{ 0x04a9, 0x327a, P_CP910, NULL, "canon-cp910"},
+		{ 0x04a9, 0x32ae, P_CP910, NULL, "canon-cp1000"},
+		{ 0x04a9, 0x32b1, P_CP910, NULL, "canon-cp1200"},
+		{ 0x04a9, 0x32db, P_CP910, NULL, "canon-cp1300"},
 		{ 0, 0, 0, NULL, NULL}
 	}
 };
@@ -557,34 +529,32 @@ struct dyesub_backend canonselphyneo_backend = {
 	Stream formats and readback codes for supported printers
 
  ***************************************************************************
- Selphy CP820/CP910/CP1000/CP1200:
+ Selphy CP820/CP910/CP1000/CP1200/CP1300:
 
-  Radically different spool file format!  300dpi, same print sizes, but also
-  adding a 50x50mm sticker and 22x17.3mm ministickers, though I think the
-  driver treats all of those as 'C' sizes for printing purposes.
+  Radically different spool file format from older Selphy models.
+  300dpi, same nominal print sizes but slightly different dimensions.
+
+  There is also a "mini" 50mm sticker media, but I think the printer
+  treats them as 'C' size.
 
   32-byte header:
 
   0f 00 00 40 00 00 00 00  00 00 00 00 00 00 01 00
   01 00 TT 00 00 00 00 ZZ  XX XX XX XX YY YY YY YY
 
-                           cols (le32) rows (le32)
+        size               cols (le32) rows (le32)
         50                 e0 04       50 07          1248 * 1872  (P)
         4c                 80 04       c0 05          1152 * 1472  (L)
         43                 40 04       9c 02          1088 * 668   (C)
 
-  TT == 50  (P)
-     == 4c  (L)
-     == 43  (C)
-
   ZZ == 00  Y'CbCr data follows
      == 01  CMY    data follows
 
-  Followed by three planes of image data.
+  Followed by three planes of image data:
 
-  P == 7008800  == 2336256 * 3 + 32 (1872*1248)
-  L == 5087264  == 1695744 * 3 + 32 (1472*1152)
-  C == 2180384  == 726784 * 3 + 32  (1088*668)
+  P == 7008800 (2336256 * 3)
+  L == 5087264 (1695744 * 3)
+  C == 2180384 (726784  * 3)
 
   It is worth mentioning that the Y'CbCr image data is surmised to use the
   JPEG coefficients, although we realistically have no way of confirming this.
@@ -592,12 +562,17 @@ struct dyesub_backend canonselphyneo_backend = {
   Other questions:
 
     * Printer supports different lamination types, how to control?
+      - Glossy
+      - Pattern 1 (Matte)
+      - Pattern 2 (Fine Matte)
+      - Pattern 3 (Grid - not all models?)
+    * How to detect battery pack
 
  Data Readback:
 
- XX 00 YY 00  00 00 ZZ 00 00 00 00 00
+  XX 00 YY 00  00 00 ZZ 00  00 00 00 00
 
- XX == Status
+  XX == Status
 
    01  Idle
    02  Feeding Paper
@@ -606,7 +581,7 @@ struct dyesub_backend canonselphyneo_backend = {
    10  Printing C
    20  Printing L
 
- YY == Error
+  YY == Error
 
    00  None
    02  No Paper (?)
@@ -617,7 +592,7 @@ struct dyesub_backend canonselphyneo_backend = {
    0A  Media/Job mismatch
    0B  Paper Jam
 
- ZZ == Media?
+  ZZ == Media?
 
    01
    10
@@ -625,13 +600,14 @@ struct dyesub_backend canonselphyneo_backend = {
     ^-- Ribbon
    ^-- Paper
 
-   1 == P
-   2 == L ??
-   3 == C
+    1 == P
+    2 == L (??)
+    3 == C
 
 Also, the first time a readback happens after plugging in the printer:
 
 34 44 35 31  01 00 01 00  01 00 45 00      "4D51" ...??
+34 44 35 31  01 00 01 00  01 00 54 00      [also seen..]
 
 
 ** ** ** ** This is what windows sends if you print over the network:

@@ -75,13 +75,13 @@ dnl
 pushdef([GUTENPRINT_NAME],              [gutenprint])
 pushdef([GUTENPRINT_MAJOR_VERSION],     [5])
 pushdef([GUTENPRINT_MINOR_VERSION],     [3])
-pushdef([GUTENPRINT_MICRO_VERSION],     [3])
+pushdef([GUTENPRINT_MICRO_VERSION],     [4])
 dnl Append snapshot ID if STP_BUILD_SNAPSHOT is set
 pushdef([GUTENPRINT_EXTRA_VERSION],     [[]m4_esyscmd_s(scripts/snapstamp)])
-pushdef([GUTENPRINT_CURRENT_INTERFACE], [13])
-pushdef([GUTENPRINT_BINARY_AGE],        [4])
-pushdef([GUTENPRINTUI2_CURRENT_INTERFACE], [6])
-pushdef([GUTENPRINTUI2_BINARY_AGE],        [4])
+pushdef([GUTENPRINT_CURRENT_INTERFACE], [14])
+pushdef([GUTENPRINT_BINARY_AGE],        [5])
+pushdef([GUTENPRINTUI2_CURRENT_INTERFACE], [7])
+pushdef([GUTENPRINTUI2_BINARY_AGE],        [5])
 pushdef([GUTENPRINT_VERSION], GUTENPRINT_MAJOR_VERSION.GUTENPRINT_MINOR_VERSION.GUTENPRINT_MICRO_VERSION[]GUTENPRINT_EXTRA_VERSION)
 
 AC_INIT([GUTENPRINT_NAME],
@@ -192,7 +192,7 @@ dnl Specify a configuration file.
 AM_CONFIG_HEADER([config.h])
 
 dnl Available languages (translations)
-ALL_LINGUAS="ca cs da de el en_GB es fi fr gl hu it ja nb nl pl pt ru sk sl sv tr uk vi zh_CN zh_TW"
+ALL_LINGUAS="ca cs da de el en_GB es fi fr gl hr hu it ja nb nl pl pt ru sk sl sv tr uk vi zh_CN zh_TW"
 AC_SUBST(ALL_LINGUAS)
 
 dnl Set up libtool scripts.
@@ -271,7 +271,7 @@ STP_ARG_WITH_DETAILED(
   [(automatic)],
   [
     yes)
-         if test "$FOUND_CUPS_CONFIG" == "yes" ; then
+         if test "$FOUND_CUPS_CONFIG" = "yes" ; then
 	   [BUILD_CUPS]="yes"
 	   AC_MSG_RESULT([yes])
 	   cups_prefix="/usr"
@@ -289,7 +289,7 @@ STP_ARG_WITH_DETAILED(
          AC_MSG_ERROR([${withval}: no such directory for --with-cups])
        fi ;;
   ],[
-     if test "$FOUND_CUPS_CONFIG" == "yes" ; then
+     if test "$FOUND_CUPS_CONFIG" = "yes" ; then
        cups_prefix="${prefix}"
        [BUILD_CUPS]="yes"
      else
@@ -749,9 +749,9 @@ AC_DEFINE_UNQUOTED(PKGMODULEDIR, ["$PKGMODULEDIR"])
 
 dnl Compiler flags
 if test x$ac_compiler_gnu = "xyes"; then
-  STP_ADD_COMPILER_ARGS([-Wall -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wwrite-strings -Werror-implicit-function-declaration -Winline -Wformat=2 -finline-limit=131072 -Wformat -Werror=format-security -Wmissing-prototypes],, [GNUCFLAGS])
+  STP_ADD_COMPILER_ARGS([-Wall -Wcast-align -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wnested-externs -Wwrite-strings -Werror-implicit-function-declaration -Winline -Wformat=2 -finline-limit=131072 -Wformat -Werror=format-security] -D_POSIX_C_SOURCE=200809L -std=c99,, [GNUCFLAGS])
   if test x${USE_MAINTAINER_MODE} = xyes ; then
-    STP_ADD_COMPILER_ARGS([-D_POSIX_C_SOURCE=200809L -std=c99 -pedantic -Waggregate-return -Wcast-qual -Wshadow -Wredundant-decls],, [GNUCFLAGS])
+    STP_ADD_COMPILER_ARGS([ -pedantic -Waggregate-return -Wcast-qual -Wshadow -Wredundant-decls],, [GNUCFLAGS])
   fi
   if test x$ENABLE_DEBUG = xyes ; then
     STP_ADD_COMPILER_ARG([-g])
@@ -895,6 +895,7 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS([nanosleep poll usleep])
 AC_CHECK_FUNCS([getopt_long])
+AC_CHECK_FUNCS([setenv getuid waitpid])
 
 dnl finite() is non-standard, isfinite() is ISO-standard, figure out
 dnl which to use...

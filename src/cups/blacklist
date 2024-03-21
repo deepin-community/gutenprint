@@ -165,11 +165,29 @@
 # Sony UP-CR10L
 0x054c 0x0226 blacklist
 
+# Sony UP-CX1
+0x054c 0x02d4 blacklist
+
 # Sony UP-D895
 0x054c 0x0049 blacklist
 
 # Sony UP-D897
 0x054c 0x01e7 blacklist
+
+# Sony UP-D898MD
+0x054c 0x0877 blacklist
+
+# Sony UP-971AD
+0x054c 0x0873 blacklist
+
+# Sony UP-DR80
+0x054c 0x03c5 blacklist
+
+# Sony UP-DR80MD
+0x054c 0x03c3 blacklist
+
+# Stryker SDP1000
+0x054c 0x03c4 blacklist
 
 # Mitsubishi CP-D70DW/CP-D707DW
 0x06d3 0x3b30 blacklist
@@ -179,6 +197,9 @@
 
 # Mitsubishi CP-D90DW
 0x06d3 0x3b60 blacklist
+
+# Mitsubishi CP-M1
+0x06d3 0x3b80 blacklist
 
 # Mitsubishi CP-K60DW-S
 0x06d3 0x3b31 blacklist
@@ -198,6 +219,9 @@
 
 # Mitsubishi CP-9600D/DW
 0x06d3 0x03a9 blacklist
+
+# Mitsubishi CP30DW
+0x06d3 0x03ab blacklist
 
 # Mitsubishi CP-9800D/DW
 0x06d3 0x03ad blacklist
@@ -232,6 +256,12 @@
 # Citizen CX-02
 0x1343 0x000A blacklist
 
+# Citizen CX-02W
+0x1343 0x000B blacklist
+
+# Citizen CZ-01
+0x1343 0x000C blacklist
+
 # DNP DS80D
 0x1343 0x0008 blacklist
 
@@ -241,11 +271,59 @@
 # DNP DS820
 0x1452 0x9001 blacklist
 
+# DNP QW410
+0x1452 0x9201 blacklist
+
 # CIAAT Brava 21
 0x10ce 0x001e blacklist
 
 # Fujifilm ASK-300
 0x04cb 0x5006 blacklist
+
+# HiTi CS-200e
+0x0d16 0x0309 blacklist
+
+# HiTi CS-220e
+0x0d16 0x030a blacklist
+
+# HiTi CS-230e
+0x0d16 0x030b blacklist
+
+# HiTi CS-250e
+0x0d16 0x030c blacklist
+
+# HiTi CS-290e
+0x0d16 0x030d blacklist
+
+# HiTi P510K
+0x0d16 0x0007 blacklist
+
+# HiTi P510L
+0x0d16 0x000b blacklist
+
+# HiTi P518A
+0x0d16 0x000d blacklist
+
+# HiTi P510S
+0x0d16 0x010e blacklist
+
+# HiTi P510Si
+0x0d16 0x0111 blacklist
+
+# HiTi P518S
+0x0d16 0x0112 blacklist
+
+# HiTi P520L / P525L
+0x0d16 0x0502 blacklist
+
+# HiTi P720L
+0x0d16 0x0009 blacklist
+
+# HiTi P728L
+0x0d16 0x000a blacklist
+
+# HiTi P750L
+0x0d16 0x0501 blacklist
 
 # HiTi M610
 0x0d16 0x0010 blacklist

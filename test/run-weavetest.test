@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # Don't want to run this at all as part of automated test
 [ -n "$STP_TEST_SUITE" ] && exit 77

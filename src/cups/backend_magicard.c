@@ -1,11 +1,11 @@
 /*
  *   Magicard card printer family CUPS backend -- libusb-1.0 version
  *
- *   (c) 2017-2018 Solomon Peachy <pizza@shaftnet.org>
+ *   (c) 2017-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -18,35 +18,17 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <time.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <string.h>
-
 #define BACKEND magicard_backend
 
 #include "backend_common.h"
 
-/* Exported */
-#define USB_VID_MAGICARD     0x0C1F
-#define USB_PID_MAGICARD_TANGO2E 0x1800
-#define USB_PID_MAGICARD_ENDURO  0x4800   // ??
-#define USB_PID_MAGICARD_ENDUROPLUS 0x880A // ??
+#include <time.h>
 
 /* Gamma tables computed with this perl program:
 
@@ -109,20 +91,17 @@ static uint8_t gammas[2][256] = {
 };
 
 struct magicard_printjob {
+	struct dyesub_job_common common;
+
 	uint8_t *databuf;
 	int datalen;
 
 	int hdr_len;
-	int copies;
 };
 
 /* Private data structure */
 struct magicard_ctx {
-	struct libusb_device_handle *dev;
-	uint8_t endp_up;
-	uint8_t endp_down;
-	int type;
-
+	struct dyesub_connection *conn;
 	struct marker marker;
 };
 
@@ -150,8 +129,8 @@ struct magicard_resp_header {
 };
 
 struct magicard_requests {
-	char *key;
-	char *desc;
+	const char *key;
+	const char *desc;
 	uint8_t type;
 };
 
@@ -210,7 +189,7 @@ static struct magicard_requests magicard_sta_requests[] = {
 
 /* Helper functions */
 static int magicard_build_cmd(uint8_t *buf,
-			       char *cmd, char *subcmd, char *arg)
+			      const char *cmd, const char *subcmd, const char *arg)
 {
 	struct magicard_cmd_header *hdr = (struct magicard_cmd_header *) buf;
 
@@ -229,7 +208,7 @@ static int magicard_build_cmd(uint8_t *buf,
 }
 
 static int magicard_build_cmd_simple(uint8_t *buf,
-				     char *cmd)
+				     const char *cmd)
 {
 	struct magicard_cmd_simple_header *hdr = (struct magicard_cmd_simple_header *) buf;
 	int len = strlen(cmd);
@@ -266,13 +245,13 @@ static int magicard_query_sensors(struct magicard_ctx *ctx)
 		snprintf(buf2, sizeof(buf2), "SNR%d", i);
 		ret = magicard_build_cmd_simple(buf, buf2);
 
-		if ((ret = send_data(ctx->dev, ctx->endp_down,
+		if ((ret = send_data(ctx->conn,
 				     buf, ret)))
 			return ret;
 
 		memset(buf, 0, sizeof(buf));
 
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				buf, sizeof(buf), &num);
 
 		if (ret < 0)
@@ -284,7 +263,7 @@ static int magicard_query_sensors(struct magicard_ctx *ctx)
 		buf[num] = 0;
 		INFO("%s\n", buf);
 	}
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int magicard_selftest_card(struct magicard_ctx *ctx)
@@ -294,7 +273,7 @@ static int magicard_selftest_card(struct magicard_ctx *ctx)
 
 	ret = magicard_build_cmd_simple(buf, "TST,");
 
-	ret = send_data(ctx->dev, ctx->endp_down,
+	ret = send_data(ctx->conn,
 			buf, ret);
 	return ret;
 }
@@ -306,7 +285,7 @@ static int magicard_reset(struct magicard_ctx *ctx)
 
 	ret = magicard_build_cmd_simple(buf, "RST,");
 
-	ret = send_data(ctx->dev, ctx->endp_down,
+	ret = send_data(ctx->conn,
 			buf, ret);
 	return ret;
 }
@@ -318,7 +297,7 @@ static int magicard_eject(struct magicard_ctx *ctx)
 
 	ret = magicard_build_cmd_simple(buf, "EJT,");
 
-	ret = send_data(ctx->dev, ctx->endp_down,
+	ret = send_data(ctx->conn,
 			buf, ret);
 	return ret;
 }
@@ -336,13 +315,13 @@ static int magicard_query_printer(struct magicard_ctx *ctx)
 		snprintf(buf2, sizeof(buf2), "QPR%d", i);
 		ret = magicard_build_cmd_simple(buf, buf2);
 
-		if ((ret = send_data(ctx->dev, ctx->endp_down,
+		if ((ret = send_data(ctx->conn,
 				     buf, ret)))
 			return ret;
 
 		memset(buf, 0, sizeof(buf));
 
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				buf, sizeof(buf), &num);
 
 		if (ret < 0)
@@ -354,7 +333,7 @@ static int magicard_query_printer(struct magicard_ctx *ctx)
 		buf[num] = 0;
 		INFO("%s\n", buf);
 	}
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int magicard_query_status(struct magicard_ctx *ctx)
@@ -374,13 +353,13 @@ static int magicard_query_status(struct magicard_ctx *ctx)
 		ret = magicard_build_cmd(buf, "REQ", "STA",
 				   magicard_sta_requests[i].key);
 
-		if ((ret = send_data(ctx->dev, ctx->endp_down,
+		if ((ret = send_data(ctx->conn,
 				     buf, ret)))
 			return ret;
 
 		memset(buf, 0, sizeof(buf));
 
-		ret = read_data(ctx->dev, ctx->endp_up,
+		ret = read_data(ctx->conn,
 				buf, sizeof(buf), &num);
 
 		if (ret < 0)
@@ -438,29 +417,26 @@ static void* magicard_init(void)
 {
 	struct magicard_ctx *ctx = malloc(sizeof(struct magicard_ctx));
 	if (!ctx) {
-		ERROR("Memory Allocation Failure!");
+		ERROR("Memory Allocation Failure!\n");
 		return NULL;
 	}
 	memset(ctx, 0, sizeof(struct magicard_ctx));
 	return ctx;
 }
 
-static int magicard_attach(void *vctx, struct libusb_device_handle *dev, int type,
-			   uint8_t endp_up, uint8_t endp_down, uint8_t jobid)
+static int magicard_attach(void *vctx, struct dyesub_connection *conn, uint8_t jobid)
 {
 	struct magicard_ctx *ctx = vctx;
 
 	UNUSED(jobid);
 
-	ctx->dev = dev;
-	ctx->endp_up = endp_up;
-	ctx->endp_down = endp_down;
-	ctx->type = type;
+	ctx->conn = conn;
 
 	ctx->marker.color = "#00FFFF#FF00FF#FFFF00";  // XXX YMCK too!
 	ctx->marker.name = "Unknown"; // LC1/LC3/LC6/LC8
-	ctx->marker.levelmax = -1;
-	ctx->marker.levelnow = -2;
+	ctx->marker.numtype = -1;
+	ctx->marker.levelmax = CUPS_MARKER_UNAVAILABLE;
+	ctx->marker.levelnow = CUPS_MARKER_UNKNOWN;
 
 	return CUPS_BACKEND_OK;
 }
@@ -572,7 +548,8 @@ static int magicard_read_parse(void *vctx, const void **vjob, int data_fd, int c
 		return CUPS_BACKEND_RETRY_CURRENT;
 	}
 	memset(job, 0, sizeof(*job));
-	job->copies = copies;
+	job->common.jobsize = sizeof(*job);
+	job->common.copies = copies;
 
 	/* Read in the first chunk */
 	i = read(data_fd, initial_buf, INITIAL_BUF_LEN);
@@ -842,10 +819,11 @@ static int magicard_read_parse(void *vctx, const void **vjob, int data_fd, int c
 	return CUPS_BACKEND_OK;
 }
 
-static int magicard_main_loop(void *vctx, const void *vjob) {
+static int magicard_main_loop(void *vctx, const void *vjob, int wait_for_return) {
 	struct magicard_ctx *ctx = vctx;
 	int ret;
 	int copies;
+	(void)wait_for_return;
 
 	const struct magicard_printjob *job = vjob;
 
@@ -856,13 +834,13 @@ static int magicard_main_loop(void *vctx, const void *vjob) {
 	if (!job)
 		return CUPS_BACKEND_FAILED;
 
-	copies = job->copies;
+	copies = job->common.copies;
 top:
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->databuf, job->hdr_len)))
 		return CUPS_BACKEND_FAILED;
 
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->databuf + job->hdr_len, job->datalen - job->hdr_len)))
 		return CUPS_BACKEND_FAILED;
 
@@ -923,7 +901,7 @@ static int magicard_cmdline_arg(void *vctx, int argc, char **argv)
 		if (j) return j;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int magicard_query_markers(void *vctx, struct marker **markers, int *count)
@@ -938,17 +916,14 @@ static int magicard_query_markers(void *vctx, struct marker **markers, int *coun
 
 static const char *magicard_prefixes[] = {
 	"magicard", // Family name
-	"magicard-tango-2e", "magicard-enduro", "magicard-enduroplus",
-	// extras
-	"magicard-rio-2e",
 	// backwards compatibility
 	"tango2e", "enduro", "enduroplus",
 	NULL
 };
 
-struct dyesub_backend magicard_backend = {
+const struct dyesub_backend magicard_backend = {
 	.name = "Magicard family",
-	.version = "0.16",
+	.version = "0.18",
 	.uri_prefixes = magicard_prefixes,
 	.cmdline_arg = magicard_cmdline_arg,
 	.cmdline_usage = magicard_cmdline,
@@ -959,13 +934,16 @@ struct dyesub_backend magicard_backend = {
 	.main_loop = magicard_main_loop,
 	.query_markers = magicard_query_markers,
 	.devices = {
-		{ USB_VID_MAGICARD, USB_PID_MAGICARD_TANGO2E, P_MAGICARD, NULL, "magicard-tango2e"},
-		{ USB_VID_MAGICARD, USB_PID_MAGICARD_ENDURO, P_MAGICARD, NULL, "magicard-enduro"},
-		{ USB_VID_MAGICARD, USB_PID_MAGICARD_ENDUROPLUS, P_MAGICARD, NULL, "magicard-enduroplus"},
-		{ USB_VID_MAGICARD, 0xFFFF, P_MAGICARD, NULL, "magicard"},
-		{ 0, 0, 0, NULL, "magicard"}
+		{ 0x0c1f, 0x1800, P_MAGICARD, NULL, "magicard-tango2e"},
+//		{ 0x0c1f, 0x1800, P_MAGICARD, NULL, "magicard-rio2e"},
+		{ 0x0c1f, 0x4800, P_MAGICARD, NULL, "magicard-enduro"}, // ??
+		{ 0x0c1f, 0x880a, P_MAGICARD, NULL, "magicard-enduroplus"}, // ??
+		{ 0x0c1f, 0xFFFF, P_MAGICARD, NULL, "magicard"},
+		{ 0, 0, 0, NULL, NULL}
 	}
 };
+
+
 
 /* Magicard family Spool file format (Tango2e/Rio2e/AvalonE family)
 

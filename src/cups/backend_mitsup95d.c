@@ -1,7 +1,7 @@
 /*
  *   Mitsubishi P93D/P95D Monochrome Thermal Photo Printer CUPS backend
  *
- *   (c) 2016-2018 Solomon Peachy <pizza@shaftnet.org>
+ *   (c) 2016-2021 Solomon Peachy <pizza@shaftnet.org>
  *
  *   Development of this backend was sponsored by:
  *
@@ -9,7 +9,7 @@
  *
  *   The latest version of this program can be found at:
  *
- *     http://git.shaftnet.org/cgit/selphy_print.git
+ *     https://git.shaftnet.org/cgit/selphy_print.git
  *
  *   This program is free software; you can redistribute it and/or modify it
  *   under the terms of the GNU General Public License as published by the Free
@@ -22,34 +22,20 @@
  *   for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- *          [http://www.gnu.org/licenses/gpl-2.0.html]
+ *   along with this program; if not, see <https://www.gnu.org/licenses/>.
  *
  *   SPDX-License-Identifier: GPL-2.0+
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <signal.h>
-
 #define BACKEND mitsup95d_backend
 
 #include "backend_common.h"
 
-#define USB_VID_MITSU       0x06D3
-#define USB_PID_MITSU_P93D  0x0398
-#define USB_PID_MITSU_P95D  0x3b10
-
 /* Private data structure */
 struct mitsup95d_printjob {
+	struct dyesub_job_common common;
+
 	uint8_t *databuf;
 	uint32_t datalen;
 
@@ -69,11 +55,9 @@ struct mitsup95d_printjob {
 };
 
 struct mitsup95d_ctx {
-	struct libusb_device_handle *dev;
-	uint8_t endp_up;
-	uint8_t endp_down;
+	struct dyesub_connection *conn;
 
-	int type;
+	char serno[STR_LEN_MAX + 1];
 
 	struct marker marker;
 };
@@ -118,44 +102,64 @@ static int mitsup95d_get_status(struct mitsup95d_ctx *ctx, uint8_t *resp)
 
 	/* P93D is ... special.  Windows switches to this halfway through
 	   but it seems be okay to use it everywhere */
-	if (ctx->type == P_MITSU_P93D) {
+	if (ctx->conn->type == P_MITSU_P93D) {
 		querycmd[2] = 0x03;
 	}
 
 	/* Query Status to sanity-check job */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     querycmd, sizeof(querycmd))))
 		return CUPS_BACKEND_FAILED;
-	ret = read_data(ctx->dev, ctx->endp_up,
+	ret = read_data(ctx->conn,
 			resp, QUERYRESP_SIZE_MAX, &num);
 
 	if (ret < 0)
 		return CUPS_BACKEND_FAILED;
-	if (ctx->type == P_MITSU_P95D && num != 9) {
+	if (ctx->conn->type == P_MITSU_P95D && num != 9) {
 		return CUPS_BACKEND_FAILED;
-	} else if (ctx->type == P_MITSU_P93D && num != 8) {
+	} else if (ctx->conn->type == P_MITSU_P93D && num != 8) {
 		return CUPS_BACKEND_FAILED;
 	}
 	return CUPS_BACKEND_OK;
 }
 
-static int mitsup95d_attach(void *vctx, struct libusb_device_handle *dev, int type,
-			    uint8_t endp_up, uint8_t endp_down, uint8_t jobid)
+static int mitsup95d_attach(void *vctx, struct dyesub_connection *conn, uint8_t jobid)
 {
 	struct mitsup95d_ctx *ctx = vctx;
 
 	UNUSED(jobid);
 
-	ctx->dev = dev;
-	ctx->endp_up = endp_up;
-	ctx->endp_down = endp_down;
-	ctx->type = type;
+	ctx->conn = conn;
 
 	ctx->marker.color = "#000000";  /* Ie black! */
 	ctx->marker.name = "Unknown";
-	ctx->marker.levelmax = -1;
-	ctx->marker.levelnow = -2;
+	ctx->marker.numtype = -1;
+	ctx->marker.levelmax = CUPS_MARKER_UNAVAILABLE;
+	ctx->marker.levelnow = CUPS_MARKER_UNKNOWN;
 
+	if (test_mode >= TEST_MODE_NOATTACH)
+		goto done;
+
+	/* Query serial number */
+	{
+		struct libusb_device_descriptor desc;
+		struct libusb_device *udev;
+
+		udev = libusb_get_device(ctx->conn->dev);
+		libusb_get_device_descriptor(udev, &desc);
+
+		if (!desc.iSerialNumber) {
+			WARNING("Printer configured for iSerial mode U0, so no serial number is reported.\n");
+		} else {
+			libusb_get_string_descriptor_ascii(ctx->conn->dev, desc.iSerialNumber, (uint8_t*)ctx->serno, STR_LEN_MAX);
+
+			if (strstr(ctx->serno, "000000")) {
+				WARNING("Printer configured for iSerial mode U2, reporting a fixed serial number of 000000\n");
+			}
+		}
+	}
+
+done:
 	return CUPS_BACKEND_OK;
 }
 
@@ -189,6 +193,7 @@ static int mitsup95d_read_parse(void *vctx, const void **vjob, int data_fd, int 
 		return CUPS_BACKEND_RETRY_CURRENT;
 	}
 	memset(job, 0, sizeof(*job));
+	job->common.jobsize = sizeof(*job);
 
 	job->mem_clr_present = 0;
 
@@ -223,7 +228,7 @@ top:
 		ptr = tmphdr;
 		break;
 	case 0x58: /* User Comment */
-		if (ctx->type == P_MITSU_P93D)
+		if (ctx->conn->type == P_MITSU_P93D)
 			job->hdr4_len = 42;
 		else
 			job->hdr4_len = 36;
@@ -328,15 +333,18 @@ top:
 		}
 	} else if (ptr == job->ftr) {
 
-		/* XXX Update unknown header field to match sniffs */
-		if (ctx->type == P_MITSU_P95D) {
+		/* Update unknown header field to match sniffs */
+		if (ctx->conn->type == P_MITSU_P95D) {
 			if (job->hdr1[18] == 0x00)
 				job->hdr1[18] = 0x01;
 		}
 
 		/* Update printjob header to reflect number of requested copies */
 		if (job->hdr2[13] != 0xff)
-			job->hdr2[13] = copies;
+			if (copies > job->hdr2[13])
+				job->hdr2[13] = copies;
+
+		job->common.copies = copies; // XXX use larger?
 
 		*vjob = job;
 		return CUPS_BACKEND_OK;
@@ -345,7 +353,7 @@ top:
 	goto top;
 }
 
-static int mitsup95d_main_loop(void *vctx, const void *vjob) {
+static int mitsup95d_main_loop(void *vctx, const void *vjob, int wait_for_return) {
 	struct mitsup95d_ctx *ctx = vctx;
 	uint8_t queryresp[QUERYRESP_SIZE_MAX];
 	int ret;
@@ -366,7 +374,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 		if (ret)
 			return ret;
 
-		if (ctx->type == P_MITSU_P95D) {
+		if (ctx->conn->type == P_MITSU_P95D) {
 			if (queryresp[6] & 0x40) {
 				INFO("Printer Status: %s (%02x)\n", mitsup95d_errors(queryresp[6]), queryresp[6]);
 				return CUPS_BACKEND_STOP;
@@ -389,35 +397,35 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 
 	/* Send over Memory Clear, if present */
 	if (job->mem_clr_present) {
-		if ((ret = send_data(ctx->dev, ctx->endp_down,
+		if ((ret = send_data(ctx->conn,
 				     job->mem_clr, sizeof(job->mem_clr))))
 			return CUPS_BACKEND_FAILED;
 	}
 
 	/* Send Job Start */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->hdr, sizeof(job->hdr))))
 		return CUPS_BACKEND_FAILED;
 
 	/* Send over headers */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->hdr1, sizeof(job->hdr1))))
 		return CUPS_BACKEND_FAILED;
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->hdr2, sizeof(job->hdr2))))
 		return CUPS_BACKEND_FAILED;
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->hdr3, sizeof(job->hdr3))))
 		return CUPS_BACKEND_FAILED;
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->hdr4, job->hdr4_len)))
 		return CUPS_BACKEND_FAILED;
 
 	/* Send plane header and image data */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->plane, sizeof(job->plane))))
 		return CUPS_BACKEND_FAILED;
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->databuf, job->datalen)))
 		return CUPS_BACKEND_FAILED;
 
@@ -426,7 +434,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 	if (ret)
 		return ret;
 
-	if (ctx->type == P_MITSU_P95D) {
+	if (ctx->conn->type == P_MITSU_P95D) {
 		if (queryresp[6] & 0x40) {
 			INFO("Printer Status: %s (%02x)\n", mitsup95d_errors(queryresp[6]), queryresp[6]);
 			return CUPS_BACKEND_STOP;
@@ -447,7 +455,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 	}
 
 	/* Send over Footer */
-	if ((ret = send_data(ctx->dev, ctx->endp_down,
+	if ((ret = send_data(ctx->conn,
 			     job->ftr, sizeof(job->ftr))))
 		return CUPS_BACKEND_FAILED;
 
@@ -462,7 +470,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 		if (ret)
 			return ret;
 
-		if (ctx->type == P_MITSU_P95D) {
+		if (ctx->conn->type == P_MITSU_P95D) {
 			if (queryresp[6] & 0x40) {
 				INFO("Printer Status: %s (%02x)\n", mitsup95d_errors(queryresp[6]), queryresp[6]);
 				return CUPS_BACKEND_STOP;
@@ -471,7 +479,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 				break;
 
 			if (queryresp[7] > 0) {
-				if (fast_return) {
+				if (!wait_for_return) {
 					INFO("Fast return mode enabled.\n");
 					break;
 				}
@@ -484,7 +492,7 @@ static int mitsup95d_main_loop(void *vctx, const void *vjob) {
 			if (queryresp[6] == 0x30)
 				break;
 			if (queryresp[6] == 0x43 && queryresp[7] > 0) {
-				if (fast_return) {
+				if (!wait_for_return) {
 					INFO("Fast return mode enabled.\n");
 					break;
 				}
@@ -504,8 +512,16 @@ static int mitsup95d_dump_status(struct mitsup95d_ctx *ctx)
 	ret = mitsup95d_get_status(ctx, queryresp);
 	if (ret)
 		return ret;
+	if (!ctx->serno[0])
+		INFO("iSerial mode: Disasbled (U0)\n");
+	else if (strstr(ctx->serno, "000000"))
+		INFO("iSerial Mode: Force 000000 (U2)\n");
+	else {
+		INFO("iSerial Mode: Enabled (U1)\n");
+		INFO("Serial Number: %s\n", ctx->serno);
+	}
 
-	if (ctx->type == P_MITSU_P95D) {
+	if (ctx->conn->type == P_MITSU_P95D) {
 		if (queryresp[6] & 0x40) {
 			INFO("Printer Status: %s (%02x)\n", mitsup95d_errors(queryresp[6]), queryresp[6]);
 		} else if (queryresp[5] == 0x00) {
@@ -552,7 +568,7 @@ static int mitsup95d_cmdline_arg(void *vctx, int argc, char **argv)
 		if (j) return j;
 	}
 
-	return 0;
+	return CUPS_BACKEND_OK;
 }
 
 static int mitsup95d_query_markers(void *vctx, struct marker **markers, int *count)
@@ -563,9 +579,9 @@ static int mitsup95d_query_markers(void *vctx, struct marker **markers, int *cou
 	if (mitsup95d_get_status(ctx, queryresp))
 		return CUPS_BACKEND_FAILED;
 
-	ctx->marker.levelnow = -3;
+	ctx->marker.levelnow = CUPS_MARKER_UNKNOWN_OK;
 
-	if (ctx->type == P_MITSU_P95D) {
+	if (ctx->conn->type == P_MITSU_P95D) {
 		if (queryresp[6] & 0x40) {
 			ctx->marker.levelnow = 0;
 		}
@@ -575,13 +591,6 @@ static int mitsup95d_query_markers(void *vctx, struct marker **markers, int *cou
 		}
 	}
 
-	/* Lot state */
-	if (ctx->marker.levelnow)
-		STATE("-media-empty\n");
-	else
-		STATE("+media-empty\n");
-
-
 	*markers = &ctx->marker;
 	*count = 1;
 
@@ -590,16 +599,15 @@ static int mitsup95d_query_markers(void *vctx, struct marker **markers, int *cou
 
 static const char *mitsup95d_prefixes[] = {
 	"mitsup9x", // Family driver name
-	"mitsubishi-p95d", "mitsubishi-p93d",
 	// backwards compatibility
 	"mitsup95d", "mitsup93d",
 	NULL
 };
 
 /* Exported */
-struct dyesub_backend mitsup95d_backend = {
+const struct dyesub_backend mitsup95d_backend = {
 	.name = "Mitsubishi P93D/P95D",
-	.version = "0.12",
+	.version = "0.16",
 	.uri_prefixes = mitsup95d_prefixes,
 	.cmdline_arg = mitsup95d_cmdline_arg,
 	.cmdline_usage = mitsup95d_cmdline,
@@ -610,8 +618,8 @@ struct dyesub_backend mitsup95d_backend = {
 	.main_loop = mitsup95d_main_loop,
 	.query_markers = mitsup95d_query_markers,
 	.devices = {
-		{ USB_VID_MITSU, USB_PID_MITSU_P93D, P_MITSU_P93D, NULL, "mitsubishi-p93d"},
-		{ USB_VID_MITSU, USB_PID_MITSU_P95D, P_MITSU_P95D, NULL, "mitsubishi-p95d"},
+		{ 0x06d3, 0x0398, P_MITSU_P93D, NULL, "mitsubishi-p93d"},
+		{ 0x06d3, 0x3b10, P_MITSU_P95D, NULL, "mitsubishi-p95d"},
 		{ 0, 0, 0, NULL, NULL}
 	}
 };
@@ -802,7 +810,6 @@ UNKNOWNS:
  * How multiple images are stacked for printing on a single page
    (col offset too?  write four, then tell PRINT?)
  * How to adjust P95D printer sharpness?
- * Serial number query (iSerial appears bogus)
  * What "custom gamma" table does to spool file?
 
 */

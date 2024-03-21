@@ -1,3 +1,9 @@
+/*
+ * TRANSLATORS:
+ * All strings in this file must be no more than 80 bytes in length.
+ * Please take into account expansion due to multi-byte characters,
+ * as the limit is *bytes*, not characters!
+ */
 N_("EPSON Standard Inks");               /* ./escp2/inks/artisan.xml */
 N_("Six Color Photo");                   /* ./escp2/inks/artisan.xml */
 N_("Black");                             /* ./escp2/inks/artisan.xml */
@@ -571,6 +577,22 @@ N_("Five Color Raw");                    /* ./escp2/inks/pro_ultrachrome.xml */
 N_("Six Color Raw");                     /* ./escp2/inks/pro_ultrachrome.xml */
 N_("Seven Color Raw");                   /* ./escp2/inks/pro_ultrachrome.xml */
 N_("UltraChrome Matte Black");           /* ./escp2/inks/pro_ultrachrome.xml */
+N_("UltraChrome D6-S");                  /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Six Color Photo");                   /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Black");                             /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Cyan");                              /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Light Cyan");                        /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Magenta");                           /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Light Magenta");                     /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Yellow");                            /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Five Color Photo Composite");        /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Four Color Standard");               /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Three Color Composite");             /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("One Color Raw");                     /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Three Color Raw");                   /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Four Color Raw");                    /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Five Color Raw");                    /* ./escp2/inks/pro_ultrachrome_d6s.xml */
+N_("Six Color Raw");                     /* ./escp2/inks/pro_ultrachrome_d6s.xml */
 N_("Photo Black");                       /* ./escp2/inks/pro_ultrachrome_k3.xml */
 N_("Eight Color Photo");                 /* ./escp2/inks/pro_ultrachrome_k3.xml */
 N_("Black");                             /* ./escp2/inks/pro_ultrachrome_k3.xml */
@@ -796,6 +818,7 @@ N_("Manual Feed");                       /* ./escp2/inputslots/cd_cutter_roll_fe
 N_("Print to CD");                       /* ./escp2/inputslots/cd_cutter_roll_feed.xml */
 N_("Roll Feed (cut each page)");         /* ./escp2/inputslots/cd_cutter_roll_feed.xml */
 N_("Roll Feed (do not cut)");            /* ./escp2/inputslots/cd_cutter_roll_feed.xml */
+N_("Roll Feed (cut each page)");         /* ./escp2/inputslots/cutter_roll_only.xml */
 N_("Standard");                          /* ./escp2/inputslots/cd_roll_feed.xml */
 N_("Manual Feed");                       /* ./escp2/inputslots/cd_roll_feed.xml */
 N_("Print to CD");                       /* ./escp2/inputslots/cd_roll_feed.xml */
@@ -1832,6 +1855,9 @@ N_("2880 x 1440 DPI");                   /* ./escp2/model/model_134.xml */
 N_("5760 x 1440 DPI");                   /* ./escp2/model/model_134.xml */
 N_("2880 x 2880 DPI");                   /* ./escp2/model/model_134.xml */
 N_("5760 x 2880 DPI");                   /* ./escp2/model/model_134.xml */
+N_("720 x 360 DPI High Speed");          /* ./escp2/model/model_136.xml */
+N_("720 x 720 DPI");                     /* ./escp2/model/model_136.xml */
+N_("1440 x 720 DPI High Quality");       /* ./escp2/model/model_136.xml */
 N_("Plain Paper");                       /* ./escp2/media/artisan.xml */
 N_("EPSON Standard Inks");               /* ./escp2/media/artisan.xml */
 N_("Bright White Paper");                /* ./escp2/media/artisan.xml */
@@ -2553,6 +2579,10 @@ N_("Photo Quality Glossy Paper");        /* ./escp2/media/pro_ultrachrome.xml */
 N_("Ilford Heavy Paper");                /* ./escp2/media/pro_ultrachrome.xml */
 N_("ColorLife Paper");                   /* ./escp2/media/pro_ultrachrome.xml */
 N_("Other");                             /* ./escp2/media/pro_ultrachrome.xml */
+N_("Glossy");                            /* ./escp2/media/pro_ultrachrome_d6s.xml */
+N_("UltraChrome D6-S");                  /* ./escp2/media/pro_ultrachrome_d6s.xml */
+N_("Matte");                             /* ./escp2/media/pro_ultrachrome_d6s.xml */
+N_("Luster");                            /* ./escp2/media/pro_ultrachrome_d6s.xml */
 N_("Plain Paper");                       /* ./escp2/media/pro_ultrachrome_k3.xml */
 N_("UltraChrome Photo Black");           /* ./escp2/media/pro_ultrachrome_k3.xml */
 N_("UltraChrome Matte Black");           /* ./escp2/media/pro_ultrachrome_k3.xml */
@@ -2824,6 +2854,9 @@ N_("Photo");                             /* ./escp2/qualitypresets/standard.xml 
 N_("Super Photo");                       /* ./escp2/qualitypresets/standard.xml */
 N_("Ultra Photo");                       /* ./escp2/qualitypresets/standard.xml */
 N_("Best");                              /* ./escp2/qualitypresets/standard.xml */
+N_("Fast");                              /* ./escp2/qualitypresets/surelab.xml */
+N_("Standard");                          /* ./escp2/qualitypresets/surelab.xml */
+N_("High");                              /* ./escp2/qualitypresets/surelab.xml */
 N_("Fast Economy");                      /* ./escp2/qualitypresets/v2880.xml */
 N_("Economy");                           /* ./escp2/qualitypresets/v2880.xml */
 N_("Draft");                             /* ./escp2/qualitypresets/v2880.xml */
@@ -3114,7 +3147,6 @@ N_("Monarch Envelope landscape");        /* ./papers/standard.xml */
 N_("4x5 3/8");                           /* ./papers/standard.xml */
 N_("4x7");                               /* ./papers/standard.xml */
 N_("Wide 101.6x180.6");                  /* ./papers/standard.xml */
-N_("CP_L");                              /* ./papers/standard.xml */
 N_("Credit Card");                       /* ./papers/standard.xml */
 N_("Japanese Business Card");            /* ./papers/standard.xml */
 N_("Wide Postcard");                     /* ./papers/standard.xml */
@@ -4132,6 +4164,8 @@ N_("Canon PIXMA E610");                  /* ./printers/canon.xml */
 N_("Canon PIXMA E618");                  /* ./printers/canon.xml */
 N_("Canon E3100 series");                /* ./printers/canon.xml */
 N_("Canon PIXMA E3170");                 /* ./printers/canon.xml */
+N_("Canon PIXMA E3190");                 /* ./printers/canon.xml */
+N_("Canon PIXMA E3195");                 /* ./printers/canon.xml */
 N_("Canon G1000 series");                /* ./printers/canon.xml */
 N_("Canon PIXMA G1000");                 /* ./printers/canon.xml */
 N_("Canon PIXMA G1100");                 /* ./printers/canon.xml */
@@ -4452,11 +4486,13 @@ N_("Citizen CW-01");                     /* ./printers/dyesub.xml */
 N_("Citizen CW-02");                     /* ./printers/dyesub.xml */
 N_("Citizen CX");                        /* ./printers/dyesub.xml */
 N_("Citizen CX-02");                     /* ./printers/dyesub.xml */
+N_("Citizen CX-02W");                    /* ./printers/dyesub.xml */
 N_("Citizen CX-W");                      /* ./printers/dyesub.xml */
 N_("Citizen CY");                        /* ./printers/dyesub.xml */
 N_("Citizen CY-02");                     /* ./printers/dyesub.xml */
 N_("Citizen OP900");                     /* ./printers/dyesub.xml */
 N_("Citizen OP900II");                   /* ./printers/dyesub.xml */
+N_("Citizen CZ-01");                     /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing DS40");          /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing DS80");          /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing DS80DX");        /* ./printers/dyesub.xml */
@@ -4465,6 +4501,7 @@ N_("Dai Nippon Printing DS820");         /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing DSRX1");         /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing SL10");          /* ./printers/dyesub.xml */
 N_("Dai Nippon Printing SL20");          /* ./printers/dyesub.xml */
+N_("Dai Nippon Printing QW410");         /* ./printers/dyesub.xml */
 N_("Fujifilm ASK-300");                  /* ./printers/dyesub.xml */
 N_("Fujifilm ASK-2000");                 /* ./printers/dyesub.xml */
 N_("Fujifilm ASK-2500");                 /* ./printers/dyesub.xml */
@@ -4472,11 +4509,23 @@ N_("Fujifilm ASK-4000");                 /* ./printers/dyesub.xml */
 N_("Fujifilm FinePix-NX-500");           /* ./printers/dyesub.xml */
 N_("Fujifilm Printpix-CX-400");          /* ./printers/dyesub.xml */
 N_("Fujifilm Printpix-CX-550");          /* ./printers/dyesub.xml */
+N_("HiTi P510K");                        /* ./printers/dyesub.xml */
+N_("HiTi P510L");                        /* ./printers/dyesub.xml */
+N_("HiTi P510S");                        /* ./printers/dyesub.xml */
+N_("HiTi P510Si");                       /* ./printers/dyesub.xml */
+N_("HiTi P518A");                        /* ./printers/dyesub.xml */
+N_("HiTi P518S");                        /* ./printers/dyesub.xml */
+N_("HiTi P520L");                        /* ./printers/dyesub.xml */
+N_("HiTi P525L");                        /* ./printers/dyesub.xml */
+N_("HiTi P720L");                        /* ./printers/dyesub.xml */
+N_("HiTi P728L");                        /* ./printers/dyesub.xml */
+N_("HiTi P750L");                        /* ./printers/dyesub.xml */
 N_("Kodak 305");                         /* ./printers/dyesub.xml */
 N_("Kodak 605");                         /* ./printers/dyesub.xml */
 N_("Kodak 1400");                        /* ./printers/dyesub.xml */
 N_("Kodak 6800");                        /* ./printers/dyesub.xml */
 N_("Kodak 6850");                        /* ./printers/dyesub.xml */
+N_("Kodak 6900");                        /* ./printers/dyesub.xml */
 N_("Kodak 7000");                        /* ./printers/dyesub.xml */
 N_("Kodak 7010");                        /* ./printers/dyesub.xml */
 N_("Kodak 7015");                        /* ./printers/dyesub.xml */
@@ -4495,6 +4544,7 @@ N_("Kodak Printer-Dock-Plus");           /* ./printers/dyesub.xml */
 N_("Kodak Printer-Dock-Plus-S3");        /* ./printers/dyesub.xml */
 N_("Magicard Tango 2E");                 /* ./printers/dyesub.xml */
 N_("Magicard Rio 2E");                   /* ./printers/dyesub.xml */
+N_("Mitsubishi CP30DW");                 /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-3020D");               /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-3020DA");              /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-3020DAE");             /* ./printers/dyesub.xml */
@@ -4518,6 +4568,8 @@ N_("Mitsubishi CP-D90DW");               /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-D70DW");               /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-D707DW");              /* ./printers/dyesub.xml */
 N_("Mitsubishi CP-K60DW-S");             /* ./printers/dyesub.xml */
+N_("Mitsubishi CP-M1");                  /* ./printers/dyesub.xml */
+N_("Mitsubishi CP-M15");                 /* ./printers/dyesub.xml */
 N_("Mitsubishi P93D");                   /* ./printers/dyesub.xml */
 N_("Mitsubishi P95D");                   /* ./printers/dyesub.xml */
 N_("Nidac Copal DPB-4000");              /* ./printers/dyesub.xml */
@@ -4530,7 +4582,7 @@ N_("Shinko CHC-S6245");                  /* ./printers/dyesub.xml */
 N_("Shinko CHC-S9045");                  /* ./printers/dyesub.xml */
 N_("Sinfonia CHC-S1245/E1");             /* ./printers/dyesub.xml */
 N_("Sinfonia CHC-S2145/S2");             /* ./printers/dyesub.xml */
-N_("Sinfonia CHC-S2245/S2");             /* ./printers/dyesub.xml */
+N_("Sinfonia CHC-S2245/S3");             /* ./printers/dyesub.xml */
 N_("Sinfonia CHC-S6145/CS2");            /* ./printers/dyesub.xml */
 N_("Sinfonia CHC-S6245/CE1");            /* ./printers/dyesub.xml */
 N_("Sony UP-DP10");                      /* ./printers/dyesub.xml */
@@ -4540,11 +4592,16 @@ N_("Sony DPP-EX7");                      /* ./printers/dyesub.xml */
 N_("Sony UP-DR100");                     /* ./printers/dyesub.xml */
 N_("Sony UP-DR200");                     /* ./printers/dyesub.xml */
 N_("Sony UP-CR10L");                     /* ./printers/dyesub.xml */
+N_("Sony UP-CX1");                       /* ./printers/dyesub.xml */
 N_("Sony UP-D895");                      /* ./printers/dyesub.xml */
 N_("Sony UP-D897");                      /* ./printers/dyesub.xml */
 N_("Sony UP-D898");                      /* ./printers/dyesub.xml */
+N_("Sony UP-D898MD");                    /* ./printers/dyesub.xml */
+N_("Sony UP-971AD");                     /* ./printers/dyesub.xml */
+N_("Sony UP-991AD");                     /* ./printers/dyesub.xml */
 N_("Sony UP-CR20L");                     /* ./printers/dyesub.xml */
 N_("Sony UP-DR80MD");                    /* ./printers/dyesub.xml */
+N_("Stryker SDP1000");                   /* ./printers/dyesub.xml */
 N_("Epson Artisan 50");                  /* ./printers/escp2.xml */
 N_("Epson Artisan 700");                 /* ./printers/escp2.xml */
 N_("Epson Artisan 710");                 /* ./printers/escp2.xml */
@@ -4676,6 +4733,7 @@ N_("Epson Stylus Office T40W");          /* ./printers/escp2.xml */
 N_("Epson Stylus Office T1100");         /* ./printers/escp2.xml */
 N_("Epson Stylus Office T1110");         /* ./printers/escp2.xml */
 N_("Epson Stylus Office BX300F");        /* ./printers/escp2.xml */
+N_("Epson Stylus Office BX305F");        /* ./printers/escp2.xml */
 N_("Epson Stylus Office BX525WD");       /* ./printers/escp2.xml */
 N_("Epson Stylus Office BX535WD");       /* ./printers/escp2.xml */
 N_("Epson Stylus Office BX600FW");       /* ./printers/escp2.xml */
@@ -4970,6 +5028,7 @@ N_("Epson SureColor P9000");             /* ./printers/escp2.xml */
 N_("Epson SureColor P9000 Commercial Edition"); /* ./printers/escp2.xml */
 N_("Epson SureColor P10000");            /* ./printers/escp2.xml */
 N_("Epson SureColor P20000");            /* ./printers/escp2.xml */
+N_("Epson SureLab D700");                /* ./printers/escp2.xml */
 N_("Epson PictureMate");                 /* ./printers/escp2.xml */
 N_("Epson PictureMate Dash");            /* ./printers/escp2.xml */
 N_("Epson PictureMate Deluxe");          /* ./printers/escp2.xml */
@@ -5134,6 +5193,7 @@ N_("Epson PX 5500");                     /* ./printers/escp2.xml */
 N_("Epson PX G5600");                    /* ./printers/escp2.xml */
 N_("Epson PX 7000");                     /* ./printers/escp2.xml */
 N_("Epson PX 9000");                     /* ./printers/escp2.xml */
+N_("Fujifilm DX100");                    /* ./printers/escp2.xml */
 N_("Compaq IJ1200");                     /* ./printers/lexmark.xml */
 N_("Lexmark X73");                       /* ./printers/lexmark.xml */
 N_("Lexmark Z42");                       /* ./printers/lexmark.xml */

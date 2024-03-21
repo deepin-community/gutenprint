@@ -1,5 +1,6 @@
 Source: gutenprint
 Maintainer: Debian Printing Group <debian-printing@lists.debian.org>
+Uploaders: Thorsten Alteholz <debian@alteholz.de>
 Section: graphics
 Priority: optional
 Build-Depends-Indep:

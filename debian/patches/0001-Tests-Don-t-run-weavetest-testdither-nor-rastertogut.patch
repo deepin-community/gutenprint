@@ -9,7 +9,7 @@ Subject: Tests: Don't run weavetest,
  2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/src/cups/Makefile.am b/src/cups/Makefile.am
-index 1812d55..99e5673 100644
+index aa62ea9..64627f0 100644
 --- a/src/cups/Makefile.am
 +++ b/src/cups/Makefile.am
 @@ -100,7 +100,7 @@ endif

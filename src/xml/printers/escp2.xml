@@ -189,7 +189,7 @@
       <printer translate="name" name="Epson Stylus Office B30" driver="escp2-of-b30" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office B33" driver="escp2-of-b33" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office B40W" driver="escp2-of-b40w" manufacturer="Epson" model="92" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office B42WD" driver="escp2-of-b42wd" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office B42WD" driver="escp2-of-b42wd" manufacturer="Epson" model="118" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office B1100" driver="escp2-of-b1100" manufacturer="Epson" model="99" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office T30" driver="escp2-of-t30" manufacturer="Epson" model="85" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office T33" driver="escp2-of-t33" manufacturer="Epson" model="85" parameters="standard_params" />
@@ -197,17 +197,18 @@
       <printer translate="name" name="Epson Stylus Office T1100" driver="escp2-of-t1100" manufacturer="Epson" model="99" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office T1110" driver="escp2-of-t1110" manufacturer="Epson" model="99" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office BX300F" driver="escp2-of-bx300f" manufacturer="Epson" model="94" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office BX525WD" driver="escp2-of-bx525wd" manufacturer="Epson" model="92" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office BX535WD" driver="escp2-of-bx535wd" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office BX305F" driver="escp2-of-bx305f" manufacturer="Epson" model="94" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office BX525WD" driver="escp2-of-bx525wd" manufacturer="Epson" model="118" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office BX535WD" driver="escp2-of-bx535wd" manufacturer="Epson" model="118" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office BX600FW" driver="escp2-of-bx600fw" manufacturer="Epson" model="92" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office BX625FWD" driver="escp2-of-bx625fwd" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office BX625FWD" driver="escp2-of-bx625fwd" manufacturer="Epson" model="118" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office BX630FW" driver="escp2-of-bx630fw" manufacturer="Epson" model="92" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office BX635FWD" driver="escp2-of-bx635fwd" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office BX635FWD" driver="escp2-of-bx635fwd" manufacturer="Epson" model="118" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office SX600FW" driver="escp2-of-sx600fw" manufacturer="Epson" model="92" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office SX620FW" driver="escp2-of-sx620fw" manufacturer="Epson" model="92" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office TX300F" driver="escp2-of-tx300f" manufacturer="Epson" model="94" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Office TX600FW" driver="escp2-of-tx600fw" manufacturer="Epson" model="92" parameters="standard_params" />
-      <printer translate="name" name="Epson Stylus Office TX620FWD" driver="escp2-of-tx620fwd" manufacturer="Epson" model="92" parameters="standard_params" />
+      <printer translate="name" name="Epson Stylus Office TX620FWD" driver="escp2-of-tx620fwd" manufacturer="Epson" model="118" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Photo" driver="escp2-photo" manufacturer="Epson" model="9" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Photo 700" deviceid="MFG:EPSON;MDL:Stylus Photo 700;DES:EPSON Stylus Photo 700;CMD:ESCPL2,BDC;" driver="escp2-700" manufacturer="Epson" model="7" parameters="standard_params" />
       <printer translate="name" name="Epson Stylus Photo EX" deviceid="MFG:EPSON;MDL:Stylus Photo EX;CMD:ESCPL2,BDC;" driver="escp2-ex" manufacturer="Epson" model="8" parameters="standard_params" />
@@ -496,6 +497,7 @@
       <printer translate="name" name="Epson SureColor P9000 Commercial Edition" driver="escp2-p9000c" manufacturer="Epson" model="127" parameters="standard_params">EXPERIMENTAL; violet ink not supported</printer>
       <printer translate="name" name="Epson SureColor P10000" driver="escp2-p10000" manufacturer="Epson" model="90" parameters="standard_params">EXPERIMENTAL; only three levels of gray supported</printer>
       <printer translate="name" name="Epson SureColor P20000" driver="escp2-p20000" manufacturer="Epson" model="88" parameters="standard_params">EXPERIMENTAL; only three levels of gray supported</printer>
+      <printer translate="name" name="Epson SureLab D700" driver="escp2-sl-d700" manufacturer="Epson" model="136" parameters="standard_params">EXPERIMENTAL</printer>
       <printer translate="name" name="Epson PictureMate" driver="escp2-picmate" manufacturer="Epson" model="73" parameters="standard_params" />
       <printer translate="name" name="Epson PictureMate Dash" driver="escp2-picmatedash" manufacturer="Epson" model="86" parameters="standard_params" />
       <printer translate="name" name="Epson PictureMate Deluxe" driver="escp2-picmated" manufacturer="Epson" model="73" parameters="standard_params" />
@@ -660,6 +662,7 @@
       <printer translate="name" name="Epson PX G5600" driver="escp2-pxg5600" manufacturer="Epson" model="98" parameters="standard_params" />
       <printer translate="name" name="Epson PX 7000" driver="escp2-px7000" manufacturer="Epson" model="48" parameters="standard_params" />
       <printer translate="name" name="Epson PX 9000" driver="escp2-px9000" manufacturer="Epson" model="49" parameters="standard_params" />
+      <printer translate="name" name="Fujifilm DX100" deviceid="MFG:FUJIFILM;CMD:ESCPL2,BDC,D4,D4PX;MDL:DX100;CLS:PRINTER;DES:FUJIFILM DX100;RID:02;" driver="escp2-fujifilm-dx100" manufacturer="Fujifilm" model="136" parameters="standard_params">EXPERIMENTAL</printer>
     </family>
   </printdef>
 </gutenprint>
