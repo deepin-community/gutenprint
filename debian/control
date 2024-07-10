@@ -19,6 +19,7 @@ Build-Depends:
  libreadline-dev,
  libusb-1.0-0-dev [linux-any],
  zlib1g-dev,
+ architecture-is-64-bit,
 Standards-Version: 4.6.0
 Vcs-Browser: https://salsa.debian.org/printing-team/gutenprint
 Vcs-Git: https://salsa.debian.org/printing-team/gutenprint.git
